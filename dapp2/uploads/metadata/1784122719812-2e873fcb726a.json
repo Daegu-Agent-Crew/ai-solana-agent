@@ -1,0 +1,33 @@
+{
+  "name": "AI Agent NFT",
+  "symbol": "AISOL",
+  "description": "Dr 2",
+  "image": "https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/uploads/images/1784122719812-2e873fcb726a.jpg",
+  "attributes": [
+    {
+      "trait_type": "Network",
+      "value": "Solana Devnet"
+    },
+    {
+      "trait_type": "Storage",
+      "value": "GitHub"
+    },
+    {
+      "trait_type": "Uploader Wallet",
+      "value": "FWmGGKtczrdtWQJNdimApAfzBxEKdoDFwCFQtP9DEB5i"
+    },
+    {
+      "trait_type": "SHA-256",
+      "value": "2e873fcb726a635d561094c79a534901af6c08a98a02b80c940ef28e9f62cae3"
+    }
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/uploads/images/1784122719812-2e873fcb726a.jpg",
+        "type": "image/jpeg"
+      }
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+.mint-form textarea {
+  width: 100%;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 13px 14px;
+  background: #0b1220;
+  color: #f8fafc;
+  font: inherit;
+  outline: none;
+  resize: vertical;
+}
+
+.mint-form textarea:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+.mint-form input[type="file"] {
+  padding: 10px;
+}
+
+.api-note {
+  margin: 0 !important;
+  font-size: 0.76rem;
+  overflow-wrap: anywhere;
+}
+
+.api-note code {
+  color: #a7f3d0;
+}

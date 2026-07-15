@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#070a12" />
+  <title>NFT Coupon DApp — Solana Devnet</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./upload.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <a href="../" class="back-link">← DApp Trio</a>
+      <span class="badge">DApp 2 · Solana Devnet · NFT Coupon</span>
+      <h1>🎫 NFT 쿠폰</h1>
+      <p>NFT 기반 쿠폰 발행, 민팅, 사용 처리</p>
+    </header>
+
+    <section class="card">
+      <h2>Phantom 지갑</h2>
+      <p id="wallet">연결되지 않음</p>
+      <div class="row"><span>Devnet 잔액</span><strong id="balance">-</strong></div>
+      <div class="row"><span>역할</span><strong id="role">-</strong></div>
+      <button id="connect">Phantom 연결</button>
+      <button id="refresh" disabled>잔액 새로고침</button>
+    </section>
+
+    <!-- 발행자 전용: 쿠폰 생성 -->
+    <section class="card mint-card" id="issuerPanel">
+      <div class="section-title">
+        <h2>쿠폰 발행 (발행자 전용)</h2>
+        <span class="count">Devnet</span>
+      </div>
+
+      <div class="mint-layout">
+        <div class="preview-panel">
+          <img id="mintPreview" class="mint-preview" src="./assets/ai-agent-nft.svg" alt="쿠폰 미리보기" />
+          <p id="previewMessage" class="muted">이미지를 선택하면 미리볼 수 있습니다.</p>
+        </div>
+
+        <form id="mintForm" class="mint-form">
+          <label>
+            쿠폰 이름
+            <input id="nftName" maxlength="32" value="Daegu Coupon" required />
+          </label>
+          <label>
+            심볼
+            <input id="nftSymbol" maxlength="10" value="COUPON" required />
+          </label>
+          <label>
+            쿠폰 이미지
+            <input id="nftImage" type="file" accept="image/jpeg,image/png,image/webp" />
+          </label>
+          <label>
+            설명
+            <textarea id="nftDescription" maxlength="500" rows="3" placeholder="쿠폰 설명 (예: 대구 상점 10% 할인)"></textarea>
+          </label>
+          <label>
+            쿠폰 유형
+            <select id="couponType">
+              <option value="discount">할인 쿠폰</option>
+              <option value="voucher">상품권</option>
+              <option value="event">이벤트 쿠폰</option>
+              <option value="membership">멤버십</option>
+            </select>
+          </label>
+          <label>
+            할인/값 (% 또는 금액)
+            <input id="couponValue" type="number" value="10" min="0" />
+          </label>
+          <label>
+            유효기간 (일)
+            <input id="expiryDays" type="number" value="30" min="1" max="365" />
+          </label>
+          <button id="uploadAsset" type="button">이미지 업로드 → 메타데이터 생성</button>
+          <p class="api-note">업로드 API: <code id="uploadApiUrl"></code></p>
+          <label>
+            메타데이터 JSON URI
+            <input id="metadataUri" type="url" value="https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/metadata/doctor-slump-001.json" required />
+          </label>
+          <button id="previewMetadata" type="button">메타데이터 미리보기</button>
+          <button id="mintNft" type="submit" class="primary">쿠폰 NFT 발행</button>
+          <a id="mintExplorer" class="explorer hidden" target="_blank" rel="noreferrer">Explorer에서 새 쿠폰 확인</a>
+        </form>
+      </div>
+    </section>
+
+    <!-- 보유 쿠폰 목록 -->
+    <section class="card">
+      <div class="section-title">
+        <h2>보유 쿠폰</h2>
+        <span id="userCouponCount" class="count">0</span>
+      </div>
+      <p class="muted">연결된 지갑의 NFT 쿠폰 목록입니다.</p>
+      <div id="couponGallery" class="gallery"><p class="muted">Phantom 연결 후 조회됩니다.</p></div>
+    </section>
+
+    <!-- 쿠폰 사용 처리 -->
+    <section class="card" id="usePanel">
+      <h2>쿠폰 사용</h2>
+      <p class="muted">검증자가 쿠폰 Mint 주소를 입력하여 사용 처리합니다.</p>
+      <div class="mint-form">
+        <label>
+          쿠폰 Mint 주소
+          <input id="useCouponMint" type="text" placeholder="쿠폰 NFT의 Mint 주소를 입력" />
+        </label>
+        <button id="useCoupon" type="button">쿠폰 사용 처리</button>
+        <button id="verifyCoupon" type="button">쿠폰 상태 확인</button>
+      </div>
+      <div id="useResult" class="hidden"></div>
+    </section>
+
+    <!-- 내가 발행한 쿠폰 -->
+    <section class="card">
+      <div class="section-title">
+        <h2>내가 발행한 쿠폰</h2>
+        <span id="userMintCount" class="count">0</span>
+      </div>
+      <p class="muted">이 브라우저에서 연결된 Phantom 지갑으로 발행한 쿠폰 기록.</p>
+      <div id="userMintGallery" class="gallery"><p class="muted">발행 이력을 불러오는 중…</p></div>
+      <button id="clearUserMints" type="button" disabled>이 기기의 발행 이력 지우기</button>
+    </section>
+
+    <div id="status" class="status">페이지 준비 완료</div>
+  </main>
+
+  <script src="https://unpkg.com/@solana/web3.js@1.98.4/lib/index.iife.min.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
