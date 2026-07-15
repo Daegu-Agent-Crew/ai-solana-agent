@@ -19,7 +19,7 @@ concurrency:
 jobs:
   devnet-agent:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       SOLANA_RPC_URL: https://api.devnet.solana.com
       DEVNET_AGENT_KEYPAIR: ${{ secrets.DEVNET_AGENT_KEYPAIR }}
@@ -40,7 +40,10 @@ jobs:
         run: npm run agent:test
 
       - name: Create immutable 1-of-1 SPL mint
-        run: npm run agent:mint
+        run: npm run agent:token
+
+      - name: Mint Metaplex Devnet NFT
+        run: npm run agent:nft
 
       - name: Publish reports to workflow summary
         if: always()
