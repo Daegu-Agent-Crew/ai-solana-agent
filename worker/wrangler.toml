@@ -1,0 +1,10 @@
+name = "ai-solana-upload"
+main = "src/index.js"
+compatibility_date = "2026-07-15"
+
+[vars]
+GITHUB_OWNER = "Daegu-Agent-Crew"
+GITHUB_REPO = "ai-solana-agent"
+GITHUB_BRANCH = "main"
+ALLOWED_ORIGIN = "https://daegu-agent-crew.github.io"
+MAX_FILE_SIZE = "5242880"
