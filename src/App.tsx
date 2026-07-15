@@ -5,8 +5,6 @@ type PhantomProvider = {
   publicKey?: { toString(): string };
   connect(options?: { onlyIfTrusted?: boolean }): Promise<{ publicKey: { toString(): string } }>;
   disconnect(): Promise<void>;
-  signTransaction(transaction: unknown): Promise<unknown>;
-  signAllTransactions?(transactions: unknown[]): Promise<unknown[]>;
 };
 
 declare global {
@@ -85,35 +83,32 @@ export default function App() {
     try {
       if (!wallet) throw new Error('먼저 Phantom을 연결하세요.');
       if ((balance ?? 0) < 0.02) throw new Error('Devnet SOL 잔액이 부족합니다. 최소 0.02 SOL 이상을 권장합니다.');
-      const provider = getProvider();
-      if (!provider?.publicKey) throw new Error('Phantom 연결 상태를 다시 확인하세요.');
 
       setBusy(true);
-      setStatus('민팅 모듈을 불러오는 중입니다…');
+      setStatus('공식 Phantom 민팅 모듈을 불러오는 중입니다…');
 
-      const [umiDefaults, umiCore, metadata, signerAdapters, web3] = await Promise.all([
+      const [umiDefaults, umiCore, metadata, signerAdapters, phantomModule] = await Promise.all([
         import('@metaplex-foundation/umi-bundle-defaults'),
         import('@metaplex-foundation/umi'),
         import('@metaplex-foundation/mpl-token-metadata'),
         import('@metaplex-foundation/umi-signer-wallet-adapters'),
-        import('@solana/web3.js'),
+        import('@solana/wallet-adapter-phantom'),
       ]);
 
-      const adapter = {
-        publicKey: new web3.PublicKey(provider.publicKey.toString()),
-        connected: true,
-        connecting: false,
-        disconnecting: false,
-        signTransaction: (transaction: unknown) => provider.signTransaction(transaction),
-        signAllTransactions: (transactions: unknown[]) =>
-          provider.signAllTransactions
-            ? provider.signAllTransactions(transactions)
-            : Promise.all(transactions.map((transaction) => provider.signTransaction(transaction))),
-      };
+      const adapter = new phantomModule.PhantomWalletAdapter();
+      if (!adapter.connected) {
+        await adapter.connect();
+      }
+      if (!adapter.publicKey) {
+        throw new Error('Phantom 공개 주소를 읽지 못했습니다.');
+      }
+      if (adapter.publicKey.toBase58() !== wallet) {
+        throw new Error('연결된 Phantom 계정이 변경되었습니다. 페이지를 새로고침해 다시 연결하세요.');
+      }
 
       const umi = umiDefaults.createUmi(RPC)
         .use(metadata.mplTokenMetadata())
-        .use(signerAdapters.walletAdapterIdentity(adapter as never));
+        .use(signerAdapters.walletAdapterIdentity(adapter));
 
       const mint = umiCore.generateSigner(umi);
       setStatus('Phantom에서 NFT 발행 트랜잭션을 승인하세요.');
