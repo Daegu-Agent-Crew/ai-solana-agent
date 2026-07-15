@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: devnet-agent-test
@@ -51,6 +51,17 @@ jobs:
             fi
           done
           exit 1
+
+      - name: Publish latest NFT result to repository
+        if: success()
+        shell: bash
+        run: |
+          cp reports/devnet-nft-report.json latest-nft.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add latest-nft.json
+          git commit -m "Update latest Devnet NFT result [skip ci]" || exit 0
+          git push
 
       - name: Publish reports to workflow summary
         if: always()
