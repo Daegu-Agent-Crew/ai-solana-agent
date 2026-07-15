@@ -8,12 +8,6 @@ on:
       - 'package.json'
       - '.github/workflows/devnet-agent-test.yml'
   workflow_dispatch:
-    inputs:
-      transact:
-        description: 'Run the signed zero-SOL self-transaction test'
-        required: true
-        default: true
-        type: boolean
 
 permissions:
   contents: read
@@ -25,7 +19,7 @@ concurrency:
 jobs:
   devnet-agent:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 10
     env:
       SOLANA_RPC_URL: https://api.devnet.solana.com
       DEVNET_AGENT_KEYPAIR: ${{ secrets.DEVNET_AGENT_KEYPAIR }}
@@ -43,19 +37,20 @@ jobs:
         run: npm run agent:check
 
       - name: Signed zero-SOL self-transaction
-        if: ${{ github.event_name == 'push' || inputs.transact }}
         run: npm run agent:test
 
-      - name: Publish report to workflow summary
+      - name: Create immutable 1-of-1 SPL mint
+        run: npm run agent:mint
+
+      - name: Publish reports to workflow summary
         if: always()
         run: |
-          if [ -f reports/devnet-agent-report.md ]; then
-            cat reports/devnet-agent-report.md >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo '# Devnet Agent Test Report' >> "$GITHUB_STEP_SUMMARY"
-            echo '' >> "$GITHUB_STEP_SUMMARY"
-            echo 'No report file was produced.' >> "$GITHUB_STEP_SUMMARY"
-          fi
+          for report in reports/*.md; do
+            if [ -f "$report" ]; then
+              cat "$report" >> "$GITHUB_STEP_SUMMARY"
+              echo '' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
 
       - name: Upload Devnet agent reports
         if: always()
