@@ -2,6 +2,7 @@ import { createUmi } from 'https://esm.sh/@metaplex-foundation/umi-bundle-defaul
 import { generateSigner, percentAmount } from 'https://esm.sh/@metaplex-foundation/umi@1.2.0?bundle';
 import { createNft, mplTokenMetadata } from 'https://esm.sh/@metaplex-foundation/mpl-token-metadata@3.4.0?bundle';
 import { walletAdapterIdentity } from 'https://esm.sh/@metaplex-foundation/umi-signer-wallet-adapters@1.2.0?bundle';
+import { createUploadKey } from './upload-state.js';
 
 const RPC = 'https://api.devnet.solana.com';
 const UPLOAD_API_URL = 'https://ai-solana-upload.sfex11.workers.dev';
@@ -201,6 +202,11 @@ async function uploadAsset() {
     if (!response.ok || !result.metadataUri) throw new Error(result.error || `업로드 실패: HTTP ${response.status}`);
 
     metadataUriEl.value = result.metadataUri;
+    metadataUriEl.dataset.uploadKey = createUploadKey(file, {
+      name,
+      symbol,
+      description: nftDescriptionEl.value,
+    });
     cachedMetadata = null;
     await previewMetadata();
     setStatus('업로드와 공개 검증 완료. 이제 Phantom으로 NFT를 발행할 수 있습니다.', 'success');
@@ -307,7 +313,10 @@ refreshBtn.addEventListener('click', refreshBalance);
 previewMetadataBtn.addEventListener('click', previewMetadata);
 uploadAssetBtn.addEventListener('click', uploadAsset);
 mintForm.addEventListener('submit', mintWithConnectedWallet);
-metadataUriEl.addEventListener('change', () => { cachedMetadata = null; });
+metadataUriEl.addEventListener('change', () => {
+  cachedMetadata = null;
+  delete metadataUriEl.dataset.uploadKey;
+});
 nftImageEl.addEventListener('change', () => {
   const file = nftImageEl.files?.[0];
   if (!file) return;

@@ -1,9 +1,14 @@
+import { createUploadKey } from './upload-state.js';
+
 const form = document.getElementById('mintForm');
 const mintBtn = document.getElementById('mintNft');
 const uploadBtn = document.getElementById('uploadAsset');
 const fileInput = document.getElementById('nftImage');
 const metadataInput = document.getElementById('metadataUri');
 const statusEl = document.getElementById('status');
+const nameInput = document.getElementById('nftName');
+const symbolInput = document.getElementById('nftSymbol');
+const descriptionInput = document.getElementById('nftDescription');
 
 let resubmitting = false;
 let orchestrating = false;
@@ -39,9 +44,21 @@ form.addEventListener('submit', async (event) => {
 
   try {
     const previousUri = metadataInput.value.trim();
-    mintBtn.textContent = '1/2 이미지 업로드·서명 중…';
-    uploadBtn.click();
-    await waitForUpload(previousUri);
+    const currentUploadKey = createUploadKey(file, {
+      name: nameInput.value,
+      symbol: symbolInput.value,
+      description: descriptionInput.value,
+    });
+    const canReuseUpload = previousUri && metadataInput.dataset.uploadKey === currentUploadKey;
+
+    if (canReuseUpload) {
+      statusEl.textContent = '기존 업로드를 재사용해 NFT 발행을 준비합니다.';
+      statusEl.className = 'status working';
+    } else {
+      mintBtn.textContent = '1/2 이미지 업로드·서명 중…';
+      uploadBtn.click();
+      await waitForUpload(previousUri);
+    }
 
     mintBtn.textContent = '2/2 Phantom NFT 발행 준비 중…';
     resubmitting = true;
