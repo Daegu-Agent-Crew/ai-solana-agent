@@ -71,6 +71,16 @@
     </section>
 
     <section class="card">
+      <div class="section-title">
+        <h2>내가 발행한 NFT</h2>
+        <span id="userMintCount" class="count">0</span>
+      </div>
+      <p class="muted">이 브라우저에서 연결된 Phantom 지갑으로 발행한 NFT를 자동으로 기록합니다.</p>
+      <div id="userMintGallery" class="gallery"><p class="muted">민팅 이력을 불러오는 중…</p></div>
+      <button id="clearUserMints" type="button" disabled>이 기기의 민팅 이력 지우기</button>
+    </section>
+
+    <section class="card">
       <h2>최신 자동 민팅 NFT</h2>
       <div class="row"><span>상태</span><strong id="latestNftStatus">확인 중…</strong></div>
       <div class="row"><span>이름</span><strong id="latestNftName">-</strong></div>
@@ -91,5 +101,6 @@
 
   <script src="https://unpkg.com/@solana/web3.js@1.98.4/lib/index.iife.min.js"></script>
   <script type="module" src="./app.js"></script>
+  <script type="module" src="./user-mints.js"></script>
 </body>
 </html>
