@@ -80,20 +80,31 @@ jobs:
           done
           exit 1
 
-      - name: Publish latest NFT result to repository
+      - name: Publish latest result and mint history
         shell: bash
         run: |
           set -euo pipefail
           test -s reports/devnet-nft-report.json
           cp reports/devnet-nft-report.json latest-nft.json
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const latest = JSON.parse(fs.readFileSync('latest-nft.json', 'utf8'));
+          let history = [];
+          if (fs.existsSync('nft-history.json')) {
+            const parsed = JSON.parse(fs.readFileSync('nft-history.json', 'utf8'));
+            history = Array.isArray(parsed) ? parsed : [];
+          }
+          history = [latest, ...history.filter((item) => item?.mint !== latest.mint)].slice(0, 100);
+          fs.writeFileSync('nft-history.json', JSON.stringify(history, null, 2) + '\n');
+          NODE
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f latest-nft.json
+          git add -f latest-nft.json nft-history.json
           if git diff --cached --quiet; then
-            echo "latest-nft.json unchanged"
+            echo "NFT result files unchanged"
             exit 0
           fi
-          git commit -m "Update latest Devnet NFT result [skip ci]"
+          git commit -m "Archive Devnet NFT mint result [skip ci]"
           git pull --rebase origin main
           git push origin HEAD:main
 
