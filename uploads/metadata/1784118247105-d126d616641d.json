@@ -1,0 +1,29 @@
+{
+  "name": "Worker Address Test",
+  "symbol": "TEST",
+  "description": "ai-solana-upload endpoint verification",
+  "image": "https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/uploads/images/1784118247105-d126d616641d.png",
+  "attributes": [
+    {
+      "trait_type": "Network",
+      "value": "Solana Devnet"
+    },
+    {
+      "trait_type": "Storage",
+      "value": "GitHub"
+    },
+    {
+      "trait_type": "Uploader Wallet",
+      "value": "11111111111111111111111111111111"
+    }
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/uploads/images/1784118247105-d126d616641d.png",
+        "type": "image/png"
+      }
+    ]
+  }
+}
