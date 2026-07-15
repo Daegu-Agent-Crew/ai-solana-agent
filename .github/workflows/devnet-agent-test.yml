@@ -39,9 +39,6 @@ jobs:
       - name: Signed zero-SOL self-transaction
         run: npm run agent:test
 
-      - name: Create immutable 1-of-1 SPL mint
-        run: npm run agent:token
-
       - name: Mint Metaplex Devnet NFT
         run: npm run agent:nft
 
