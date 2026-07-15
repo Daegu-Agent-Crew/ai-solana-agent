@@ -1,29 +1,14 @@
 {
-  "name": "ai-solana-agent",
+  "name": "ai-solana-agent-ci",
   "private": true,
-  "version": "0.4.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "tsc -b && vite build",
-    "preview": "vite --host 0.0.0.0"
+    "agent:wallet": "node scripts/generate-devnet-wallet.mjs",
+    "agent:check": "node scripts/devnet-agent-test.mjs --check",
+    "agent:test": "node scripts/devnet-agent-test.mjs --transact"
   },
   "dependencies": {
-    "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
-    "@metaplex-foundation/umi": "^1.2.0",
-    "@metaplex-foundation/umi-bundle-defaults": "^1.2.0",
-    "@metaplex-foundation/umi-signer-wallet-adapters": "^1.2.0",
-    "@solana/wallet-adapter-phantom": "^0.9.28",
-    "@solana/web3.js": "^1.98.4",
-    "buffer": "^6.0.3",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
-  },
-  "devDependencies": {
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.6.0",
-    "typescript": "^5.8.3",
-    "vite": "^7.0.4"
+    "@solana/web3.js": "^1.98.4"
   }
 }
