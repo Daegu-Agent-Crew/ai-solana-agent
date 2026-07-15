@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import path from 'node:path';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import {
   createSignerFromKeypair,
@@ -10,6 +9,7 @@ import {
 import {
   createNft,
   fetchDigitalAsset,
+  findMetadataPda,
   mplTokenMetadata,
 } from '@metaplex-foundation/mpl-token-metadata';
 
@@ -21,9 +21,7 @@ const METADATA_URI = process.env.NFT_METADATA_URI ||
 if (!RPC.toLowerCase().includes('devnet')) {
   throw new Error(`Safety stop: only Devnet RPC is allowed. Received: ${RPC}`);
 }
-if (!SECRET) {
-  throw new Error('DEVNET_AGENT_KEYPAIR is required.');
-}
+if (!SECRET) throw new Error('DEVNET_AGENT_KEYPAIR is required.');
 
 const bytes = JSON.parse(SECRET);
 if (!Array.isArray(bytes) || bytes.length !== 64) {
@@ -49,23 +47,37 @@ const result = await createNft(umi, {
   symbol: 'AISOL',
   uri: METADATA_URI,
   sellerFeeBasisPoints: percentAmount(0),
-  isMutable: true,
-}).sendAndConfirm(umi);
+  isMutable: false,
+}).sendAndConfirm(umi, { confirm: { commitment: 'confirmed' } });
 
-const asset = await fetchDigitalAsset(umi, mint.publicKey);
-const signature = Buffer.from(result.signature).toString('base64');
+const metadataPda = findMetadataPda(umi, { mint: mint.publicKey })[0];
+let asset = null;
+let verificationWarning = '';
+
+for (let attempt = 1; attempt <= 12; attempt += 1) {
+  try {
+    asset = await fetchDigitalAsset(umi, mint.publicKey);
+    break;
+  } catch (error) {
+    verificationWarning = error instanceof Error ? error.message : String(error);
+    console.log(`Metadata verification attempt ${attempt}/12 pending: ${verificationWarning}`);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  }
+}
+
 const explorer = `https://explorer.solana.com/address/${mint.publicKey}?cluster=devnet`;
-
 const report = {
   ok: true,
   network: 'devnet',
   wallet: identity.publicKey.toString(),
   mint: mint.publicKey.toString(),
-  metadata: asset.metadata.publicKey.toString(),
-  name: asset.metadata.name,
-  symbol: asset.metadata.symbol,
-  uri: asset.metadata.uri,
-  signatureBase64: signature,
+  metadata: asset?.metadata.publicKey.toString() || metadataPda.toString(),
+  name: asset?.metadata.name || name,
+  symbol: asset?.metadata.symbol || 'AISOL',
+  uri: asset?.metadata.uri || METADATA_URI,
+  verifiedByFetch: Boolean(asset),
+  verificationWarning: asset ? '' : verificationWarning,
+  signatureBytes: Array.from(result.signature),
   explorer,
   createdAt: new Date().toISOString(),
 };
@@ -79,10 +91,12 @@ fs.writeFileSync(
     `- Wallet: \`${report.wallet}\`\n` +
     `- Mint: \`${report.mint}\`\n` +
     `- Metadata: \`${report.metadata}\`\n` +
+    `- Metadata fetch verified: ${report.verifiedByFetch}\n` +
     `- Name: ${report.name}\n` +
     `- Symbol: ${report.symbol}\n` +
     `- URI: ${report.uri}\n` +
-    `- Explorer: ${report.explorer}\n`,
+    `- Explorer: ${report.explorer}\n` +
+    (report.verificationWarning ? `- Verification warning: ${report.verificationWarning}\n` : ''),
 );
 
 console.log(JSON.stringify(report, null, 2));
