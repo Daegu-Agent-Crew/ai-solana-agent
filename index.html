@@ -10,9 +10,9 @@
 <body>
   <main class="shell">
     <header class="hero">
-      <span class="badge">Solana Devnet · Phantom</span>
+      <span class="badge">Solana Devnet · Autonomous Minting</span>
       <h1>AI Solana Agent</h1>
-      <p>Phantom 연결과 Devnet 자동 NFT 민팅 결과를 확인합니다.</p>
+      <p>개발 에이전트가 자동 민팅한 NFT와 Devnet 상태를 확인합니다.</p>
     </header>
 
     <section class="card">
@@ -21,6 +21,16 @@
       <div class="row"><span>이름</span><strong id="latestNftName">-</strong></div>
       <div class="row"><span>Mint</span><strong id="latestNftMint">-</strong></div>
       <a id="latestNftExplorer" class="explorer hidden" target="_blank" rel="noreferrer">Explorer에서 NFT 확인</a>
+    </section>
+
+    <section class="card">
+      <div class="section-title">
+        <h2>자동 민팅 갤러리</h2>
+        <span id="galleryCount" class="count">0</span>
+      </div>
+      <div id="nftGallery" class="gallery">
+        <p class="muted">민팅 이력을 불러오는 중…</p>
+      </div>
     </section>
 
     <section class="card">
