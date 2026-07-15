@@ -92,7 +92,7 @@ function timingSafeEqual(a, b) {
   return diff === 0;
 }
 
-async function createChallenge(wallet, env) {
+export async function createChallenge(wallet, env) {
   if (!env.UPLOAD_AUTH_SECRET) throw new Error('UPLOAD_AUTH_SECRET is not configured.');
   const ttlSeconds = Number(env.AUTH_TTL_SECONDS || 300);
   const issuedAt = Date.now();
@@ -110,7 +110,11 @@ async function createChallenge(wallet, env) {
   return { message, token: `${payload}.${mac}`, expiresAt };
 }
 
-async function verifyAuthorization(wallet, message, token, signatureBase64, env) {
+function normalizeMessageLineEndings(value) {
+  return String(value).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+}
+
+export async function verifyAuthorization(wallet, message, token, signatureBase64, env) {
   if (!env.UPLOAD_AUTH_SECRET) throw new Error('UPLOAD_AUTH_SECRET is not configured.');
   const [payload, suppliedMac] = String(token || '').split('.');
   if (!payload || !suppliedMac) throw new Error('Upload authorization token is missing.');
@@ -123,7 +127,10 @@ async function verifyAuthorization(wallet, message, token, signatureBase64, env)
   } catch {
     throw new Error('Upload authorization payload is invalid.');
   }
-  if (challenge.wallet !== wallet || challenge.message !== message) throw new Error('Upload authorization does not match the wallet.');
+  if (challenge.wallet !== wallet) throw new Error('Upload authorization does not match the wallet.');
+  if (challenge.message !== normalizeMessageLineEndings(message)) {
+    throw new Error('Upload authorization message is invalid.');
+  }
   if (!Number.isFinite(challenge.expiresAt) || Date.now() > challenge.expiresAt) throw new Error('Upload authorization expired.');
 
   const publicKeyBytes = base58ToBytes(wallet);
@@ -136,7 +143,7 @@ async function verifyAuthorization(wallet, message, token, signatureBase64, env)
     { name: 'Ed25519' },
     publicKey,
     signatureBytes,
-    new TextEncoder().encode(message),
+    new TextEncoder().encode(challenge.message),
   );
   if (!verified) throw new Error('Wallet signature verification failed.');
 }
