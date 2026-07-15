@@ -7,36 +7,38 @@ const RPC = 'https://api.devnet.solana.com';
 const UPLOAD_API_URL = 'https://ai-solana-upload.sfex11.workers.dev';
 const connection = new solanaWeb3.Connection(RPC, 'confirmed');
 
-const walletEl = document.getElementById('wallet');
-const balanceEl = document.getElementById('balance');
-const statusEl = document.getElementById('status');
-const connectBtn = document.getElementById('connect');
-const refreshBtn = document.getElementById('refresh');
-const mintBtn = document.getElementById('mintNft');
-const mintForm = document.getElementById('mintForm');
-const metadataUriEl = document.getElementById('metadataUri');
-const nftNameEl = document.getElementById('nftName');
-const nftSymbolEl = document.getElementById('nftSymbol');
-const isMutableEl = document.getElementById('isMutable');
-const mintPreviewEl = document.getElementById('mintPreview');
-const previewMessageEl = document.getElementById('previewMessage');
-const previewMetadataBtn = document.getElementById('previewMetadata');
-const nftImageEl = document.getElementById('nftImage');
-const nftDescriptionEl = document.getElementById('nftDescription');
-const uploadAssetBtn = document.getElementById('uploadAsset');
-const uploadApiUrlEl = document.getElementById('uploadApiUrl');
-const mintExplorerEl = document.getElementById('mintExplorer');
-const latestNftStatusEl = document.getElementById('latestNftStatus');
-const latestNftNameEl = document.getElementById('latestNftName');
-const latestNftMintEl = document.getElementById('latestNftMint');
-const latestNftExplorerEl = document.getElementById('latestNftExplorer');
-const galleryEl = document.getElementById('nftGallery');
-const galleryCountEl = document.getElementById('galleryCount');
+const $ = (id) => document.getElementById(id);
+const walletEl = $('wallet');
+const balanceEl = $('balance');
+const statusEl = $('status');
+const connectBtn = $('connect');
+const refreshBtn = $('refresh');
+const mintBtn = $('mintNft');
+const mintForm = $('mintForm');
+const metadataUriEl = $('metadataUri');
+const nftNameEl = $('nftName');
+const nftSymbolEl = $('nftSymbol');
+const isMutableEl = $('isMutable');
+const mintPreviewEl = $('mintPreview');
+const previewMessageEl = $('previewMessage');
+const previewMetadataBtn = $('previewMetadata');
+const nftImageEl = $('nftImage');
+const nftDescriptionEl = $('nftDescription');
+const uploadAssetBtn = $('uploadAsset');
+const uploadApiUrlEl = $('uploadApiUrl');
+const mintExplorerEl = $('mintExplorer');
+const latestNftStatusEl = $('latestNftStatus');
+const latestNftNameEl = $('latestNftName');
+const latestNftMintEl = $('latestNftMint');
+const latestNftExplorerEl = $('latestNftExplorer');
+const galleryEl = $('nftGallery');
+const galleryCountEl = $('galleryCount');
 
 let provider = null;
 let publicKey = null;
 let cachedMetadata = null;
 let minting = false;
+let localImageUrl = '';
 
 uploadApiUrlEl.textContent = UPLOAD_API_URL;
 
@@ -51,8 +53,7 @@ function getProvider() {
 }
 
 function shortAddress(value) {
-  if (!value || value.length < 14) return value || '-';
-  return `${value.slice(0, 7)}…${value.slice(-7)}`;
+  return value && value.length >= 14 ? `${value.slice(0, 7)}…${value.slice(-7)}` : value || '-';
 }
 
 function escapeHtml(value) {
@@ -66,6 +67,15 @@ function formatDate(value) {
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   }).format(new Date(value));
+}
+
+function bytesToBase64(bytes) {
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
 }
 
 function updateMintButton() {
@@ -87,19 +97,28 @@ function validateMintInput() {
   return { name, symbol, uri, isMutable: isMutableEl.checked };
 }
 
-async function fetchMetadata(uri) {
-  const response = await fetch(`${uri}${uri.includes('?') ? '&' : '?'}t=${Date.now()}`, { cache: 'no-store' });
-  if (!response.ok) throw new Error(`메타데이터 요청 실패: HTTP ${response.status}`);
-  const metadata = await response.json();
-  if (!metadata?.name || !metadata?.image) throw new Error('메타데이터에 name과 image가 필요합니다.');
-  return metadata;
+async function fetchMetadataWithRetry(uri, attempts = 8) {
+  let lastError = null;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetch(`${uri}${uri.includes('?') ? '&' : '?'}t=${Date.now()}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const metadata = await response.json();
+      if (!metadata?.name || !metadata?.image) throw new Error('메타데이터에 name과 image가 필요합니다.');
+      return metadata;
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, Math.min(attempt * 700, 2500)));
+    }
+  }
+  throw new Error(`메타데이터 요청 실패: ${lastError?.message || lastError}`);
 }
 
 async function previewMetadata() {
   try {
     const { uri } = validateMintInput();
     setStatus('메타데이터 확인 중…', 'working');
-    cachedMetadata = await fetchMetadata(uri);
+    cachedMetadata = await fetchMetadataWithRetry(uri);
     mintPreviewEl.src = cachedMetadata.image;
     mintPreviewEl.alt = cachedMetadata.name || 'NFT 미리보기';
     previewMessageEl.textContent = cachedMetadata.description || cachedMetadata.name || '메타데이터 확인 완료';
@@ -108,53 +127,6 @@ async function previewMetadata() {
     cachedMetadata = null;
     previewMessageEl.textContent = error.message || String(error);
     setStatus(`미리보기 실패: ${error.message || error}`, 'error');
-  }
-}
-
-async function uploadAsset() {
-  const file = nftImageEl.files?.[0];
-  if (!file) {
-    setStatus('업로드할 JPG, PNG 또는 WebP 이미지를 선택하세요.', 'error');
-    return;
-  }
-
-  const name = nftNameEl.value.trim();
-  const symbol = nftSymbolEl.value.trim().toUpperCase();
-  if (!name || !symbol) {
-    setStatus('NFT 이름과 심볼을 먼저 입력하세요.', 'error');
-    return;
-  }
-
-  const form = new FormData();
-  form.append('file', file);
-  form.append('name', name);
-  form.append('symbol', symbol);
-  form.append('description', nftDescriptionEl.value.trim());
-  form.append('wallet', publicKey?.toString() || '');
-
-  uploadAssetBtn.disabled = true;
-  uploadAssetBtn.textContent = 'GitHub에 업로드 중…';
-  setStatus('이미지 검사와 메타데이터 생성을 진행 중입니다…', 'working');
-
-  try {
-    const response = await fetch(`${UPLOAD_API_URL}/api/upload`, {
-      method: 'POST',
-      body: form,
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok || !result.metadataUri) {
-      throw new Error(result.error || `업로드 실패: HTTP ${response.status}`);
-    }
-
-    metadataUriEl.value = result.metadataUri;
-    cachedMetadata = null;
-    await previewMetadata();
-    setStatus('업로드 완료. 생성된 메타데이터로 NFT를 발행할 수 있습니다.', 'success');
-  } catch (error) {
-    setStatus(`이미지 업로드 실패: ${error.message || error}`, 'error');
-  } finally {
-    uploadAssetBtn.disabled = false;
-    uploadAssetBtn.textContent = '이미지 업로드 → 메타데이터 생성';
   }
 }
 
@@ -183,11 +155,60 @@ async function connectWallet() {
   return publicKey;
 }
 
-async function handleConnectClick() {
+async function getSignedUploadAuthorization() {
+  if (!provider || !publicKey) await connectWallet();
+  if (typeof provider.signMessage !== 'function') throw new Error('현재 Phantom 환경은 메시지 서명을 지원하지 않습니다.');
+
+  const wallet = publicKey.toString();
+  const response = await fetch(`${UPLOAD_API_URL}/api/auth/challenge?wallet=${encodeURIComponent(wallet)}`, { cache: 'no-store' });
+  const challenge = await response.json().catch(() => ({}));
+  if (!response.ok || !challenge.message || !challenge.token) {
+    throw new Error(challenge.error || `인증 요청 실패: HTTP ${response.status}`);
+  }
+
+  setStatus('Phantom에서 이미지 업로드 권한 서명을 승인하세요.', 'working');
+  const signed = await provider.signMessage(new TextEncoder().encode(challenge.message), 'utf8');
+  const signature = signed?.signature || signed;
+  if (!signature) throw new Error('Phantom 메시지 서명을 받지 못했습니다.');
+  return { wallet, authMessage: challenge.message, authToken: challenge.token, signature: bytesToBase64(signature) };
+}
+
+async function uploadAsset() {
+  const file = nftImageEl.files?.[0];
+  if (!file) return setStatus('업로드할 JPG, PNG 또는 WebP 이미지를 선택하세요.', 'error');
+  const name = nftNameEl.value.trim();
+  const symbol = nftSymbolEl.value.trim().toUpperCase();
+  if (!name || !symbol) return setStatus('NFT 이름과 심볼을 먼저 입력하세요.', 'error');
+
+  uploadAssetBtn.disabled = true;
+  uploadAssetBtn.textContent = '업로드 인증 중…';
   try {
-    await connectWallet();
+    const auth = await getSignedUploadAuthorization();
+    const form = new FormData();
+    form.append('file', file);
+    form.append('name', name);
+    form.append('symbol', symbol);
+    form.append('description', nftDescriptionEl.value.trim());
+    form.append('wallet', auth.wallet);
+    form.append('authMessage', auth.authMessage);
+    form.append('authToken', auth.authToken);
+    form.append('signature', auth.signature);
+
+    uploadAssetBtn.textContent = 'GitHub에 업로드 중…';
+    setStatus('이미지 저장과 메타데이터 공개 여부를 확인 중입니다…', 'working');
+    const response = await fetch(`${UPLOAD_API_URL}/api/upload`, { method: 'POST', body: form });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.metadataUri) throw new Error(result.error || `업로드 실패: HTTP ${response.status}`);
+
+    metadataUriEl.value = result.metadataUri;
+    cachedMetadata = null;
+    await previewMetadata();
+    setStatus('업로드와 공개 검증 완료. 이제 Phantom으로 NFT를 발행할 수 있습니다.', 'success');
   } catch (error) {
-    setStatus(`연결 실패: ${error.message || error}`, 'error');
+    setStatus(`이미지 업로드 실패: ${error.message || error}`, 'error');
+  } finally {
+    uploadAssetBtn.disabled = false;
+    uploadAssetBtn.textContent = '이미지 업로드 → 메타데이터 생성';
   }
 }
 
@@ -196,21 +217,18 @@ async function mintWithConnectedWallet(event) {
   try {
     const input = validateMintInput();
     if (!provider || !publicKey) await connectWallet();
-
     minting = true;
     mintBtn.disabled = true;
     mintBtn.textContent = 'NFT 발행 진행 중…';
     mintExplorerEl.classList.add('hidden');
 
     setStatus('메타데이터 검증 중…', 'working');
-    cachedMetadata = await fetchMetadata(input.uri);
+    cachedMetadata = await fetchMetadataWithRetry(input.uri);
     mintPreviewEl.src = cachedMetadata.image;
     previewMessageEl.textContent = cachedMetadata.description || cachedMetadata.name;
 
-    setStatus('NFT 트랜잭션 생성 중…', 'working');
     const umi = createUmi(RPC).use(mplTokenMetadata()).use(walletAdapterIdentity(provider));
     const mint = generateSigner(umi);
-
     setStatus('Phantom에서 NFT 발행 트랜잭션을 승인하세요.', 'working');
     await createNft(umi, {
       mint,
@@ -262,7 +280,7 @@ async function loadNftHistory() {
     if (!Array.isArray(history)) throw new Error('민팅 이력 형식 오류');
     galleryCountEl.textContent = String(history.length);
     const enriched = await Promise.all(history.map(async (nft) => {
-      try { return { ...nft, offchain: await fetchMetadata(nft.uri) }; }
+      try { return { ...nft, offchain: await fetchMetadataWithRetry(nft.uri, 2) }; }
       catch { return { ...nft, offchain: null }; }
     }));
     galleryEl.innerHTML = enriched.map((nft) => {
@@ -281,12 +299,23 @@ async function loadNftHistory() {
   }
 }
 
-connectBtn.addEventListener('click', handleConnectClick);
+connectBtn.addEventListener('click', async () => {
+  try { await connectWallet(); }
+  catch (error) { setStatus(`연결 실패: ${error.message || error}`, 'error'); }
+});
 refreshBtn.addEventListener('click', refreshBalance);
 previewMetadataBtn.addEventListener('click', previewMetadata);
 uploadAssetBtn.addEventListener('click', uploadAsset);
 mintForm.addEventListener('submit', mintWithConnectedWallet);
 metadataUriEl.addEventListener('change', () => { cachedMetadata = null; });
+nftImageEl.addEventListener('change', () => {
+  const file = nftImageEl.files?.[0];
+  if (!file) return;
+  if (localImageUrl) URL.revokeObjectURL(localImageUrl);
+  localImageUrl = URL.createObjectURL(file);
+  mintPreviewEl.src = localImageUrl;
+  previewMessageEl.textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+});
 
 window.addEventListener('load', async () => {
   updateMintButton();
@@ -301,7 +330,7 @@ window.addEventListener('load', async () => {
     refreshBtn.disabled = false;
     updateMintButton();
     await refreshBalance();
-  } catch (_) {
+  } catch {
     updateMintButton();
   }
 });
