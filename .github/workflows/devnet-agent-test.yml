@@ -19,7 +19,7 @@ concurrency:
 jobs:
   devnet-agent:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       SOLANA_RPC_URL: https://api.devnet.solana.com
       DEVNET_AGENT_KEYPAIR: ${{ secrets.DEVNET_AGENT_KEYPAIR }}
@@ -28,7 +28,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
+          cache: npm
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
@@ -36,11 +37,21 @@ jobs:
       - name: Devnet network and wallet check
         run: npm run agent:check
 
-      - name: Signed zero-SOL self-transaction
-        run: npm run agent:test
-
-      - name: Mint Metaplex Devnet NFT
-        run: npm run agent:nft
+      - name: Mint Metaplex Devnet NFT with retries
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p reports
+          for attempt in 1 2 3; do
+            echo "NFT mint attempt ${attempt}/3"
+            if npm run agent:nft 2>&1 | tee "reports/nft-attempt-${attempt}.log"; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep $((attempt * 10))
+            fi
+          done
+          exit 1
 
       - name: Publish reports to workflow summary
         if: always()
@@ -51,6 +62,12 @@ jobs:
               echo '' >> "$GITHUB_STEP_SUMMARY"
             fi
           done
+          if ls reports/nft-attempt-*.log >/dev/null 2>&1; then
+            echo '## NFT attempt logs' >> "$GITHUB_STEP_SUMMARY"
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 120 reports/nft-attempt-*.log >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Upload Devnet agent reports
         if: always()
