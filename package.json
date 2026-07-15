@@ -1,14 +1,15 @@
 {
   "name": "ai-solana-agent-ci",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.2.1",
   "type": "module",
   "scripts": {
     "agent:wallet": "node scripts/generate-devnet-wallet.mjs",
     "agent:check": "node scripts/devnet-agent-test.mjs --check",
     "agent:test": "node scripts/devnet-agent-test.mjs --transact",
     "agent:token": "node scripts/mint-test-token.mjs",
-    "agent:nft": "node scripts/mint-devnet-nft.mjs"
+    "agent:nft": "node scripts/mint-devnet-nft.mjs",
+    "agent:mint": "node scripts/mint-test-token.mjs && node scripts/mint-devnet-nft.mjs"
   },
   "dependencies": {
     "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
