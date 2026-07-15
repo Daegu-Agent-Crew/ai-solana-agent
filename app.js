@@ -54,15 +54,33 @@ async function connectWallet() {
   }
 }
 
+async function waitForConfirmation(signature, timeoutMs = 45000) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const result = await connection.getSignatureStatuses([signature], {
+      searchTransactionHistory: true,
+    });
+    const status = result.value[0];
+    if (status?.err) {
+      throw new Error(`트랜잭션 오류: ${JSON.stringify(status.err)}`);
+    }
+    if (status?.confirmationStatus === 'confirmed' || status?.confirmationStatus === 'finalized') {
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+  }
+  throw new Error('확인 시간이 초과되었습니다. Explorer에서 서명 상태를 확인하세요.');
+}
+
 async function sendTestTransaction() {
   try {
     if (!provider || !publicKey) throw new Error('먼저 Phantom을 연결하세요.');
 
-    setStatus('테스트 트랜잭션 준비 중…', 'working');
-    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
+    setStatus('최신 블록해시로 테스트 트랜잭션 준비 중…', 'working');
+    const latest = await connection.getLatestBlockhash('finalized');
     const transaction = new solanaWeb3.Transaction({
       feePayer: publicKey,
-      recentBlockhash: blockhash,
+      recentBlockhash: latest.blockhash,
     }).add(
       solanaWeb3.SystemProgram.transfer({
         fromPubkey: publicKey,
@@ -72,16 +90,21 @@ async function sendTestTransaction() {
     );
 
     setStatus('Phantom에서 트랜잭션을 승인하세요.', 'working');
-    const result = await provider.signAndSendTransaction(transaction);
-    const signature = typeof result === 'string' ? result : result.signature;
+    const signedTransaction = await provider.signTransaction(transaction);
 
-    await connection.confirmTransaction(
-      { signature, blockhash, lastValidBlockHeight },
-      'confirmed',
-    );
+    setStatus('서명된 트랜잭션 전송 중…', 'working');
+    const signature = await connection.sendRawTransaction(signedTransaction.serialize(), {
+      skipPreflight: false,
+      preflightCommitment: 'confirmed',
+      maxRetries: 5,
+    });
 
     explorerEl.href = `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
     explorerEl.classList.remove('hidden');
+
+    setStatus('Devnet 확인 중…', 'working');
+    await waitForConfirmation(signature);
+
     setStatus(`테스트 트랜잭션 성공: ${signature}`, 'success');
     await refreshBalance();
   } catch (error) {
