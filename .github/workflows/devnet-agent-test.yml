@@ -8,6 +8,27 @@ on:
       - 'package.json'
       - '.github/workflows/devnet-agent-test.yml'
   workflow_dispatch:
+    inputs:
+      nft_name:
+        description: 'NFT name (maximum 32 UTF-8 bytes)'
+        required: false
+        default: 'AI Agent NFT'
+        type: string
+      nft_symbol:
+        description: 'NFT symbol (maximum 10 UTF-8 bytes)'
+        required: false
+        default: 'AISOL'
+        type: string
+      metadata_uri:
+        description: 'Public HTTPS metadata JSON URI'
+        required: false
+        default: 'https://daegu-agent-crew.github.io/ai-solana-agent/metadata/doctor-slump-001.json'
+        type: string
+      is_mutable:
+        description: 'Allow metadata updates after minting'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -23,6 +44,10 @@ jobs:
     env:
       SOLANA_RPC_URL: https://api.devnet.solana.com
       DEVNET_AGENT_KEYPAIR: ${{ secrets.DEVNET_AGENT_KEYPAIR }}
+      NFT_NAME: ${{ github.event_name == 'workflow_dispatch' && inputs.nft_name || '' }}
+      NFT_SYMBOL: ${{ github.event_name == 'workflow_dispatch' && inputs.nft_symbol || 'AISOL' }}
+      NFT_METADATA_URI: ${{ github.event_name == 'workflow_dispatch' && inputs.metadata_uri || 'https://daegu-agent-crew.github.io/ai-solana-agent/metadata/doctor-slump-001.json' }}
+      NFT_IS_MUTABLE: ${{ github.event_name == 'workflow_dispatch' && inputs.is_mutable || false }}
     steps:
       - uses: actions/checkout@v4
         with:
