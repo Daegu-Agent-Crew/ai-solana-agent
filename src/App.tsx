@@ -1,139 +1,139 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
-import { generateSigner, percentAmount } from '@metaplex-foundation/umi';
-import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
-import { createNft, mplTokenMetadata } from '@metaplex-foundation/mpl-token-metadata';
+import { useEffect, useState } from 'react';
 
-const METADATA_URI = 'https://daegu-agent-crew.github.io/ai-solana-agent/metadata/doctor-slump-001.json';
+type PhantomProvider = {
+  isPhantom?: boolean;
+  publicKey?: { toString(): string };
+  connect(options?: { onlyIfTrusted?: boolean }): Promise<{ publicKey: { toString(): string } }>;
+  disconnect(): Promise<void>;
+};
+
+declare global {
+  interface Window {
+    phantom?: { solana?: PhantomProvider };
+    solana?: PhantomProvider;
+  }
+}
+
+const RPC = 'https://api.devnet.solana.com';
+
+async function rpc(method: string, params: unknown[]) {
+  const response = await fetch(RPC, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+  });
+  const json = await response.json();
+  if (json.error) throw new Error(json.error.message || 'Solana RPC 오류');
+  return json.result;
+}
+
+function getProvider(): PhantomProvider | null {
+  const provider = window.phantom?.solana || window.solana;
+  return provider?.isPhantom ? provider : null;
+}
 
 export default function App() {
-  const { connection } = useConnection();
-  const wallet = useWallet();
+  const [wallet, setWallet] = useState('');
   const [balance, setBalance] = useState<number | null>(null);
-  const [name, setName] = useState('닥터슬럼프 #001');
-  const [description, setDescription] = useState('사막 디오라마를 배경으로 한 AI 팬아트 스타일 컬렉터 이미지. Solana Devnet 검증용 NFT입니다.');
-  const [status, setStatus] = useState('Phantom을 연결하세요.');
+  const [status, setStatus] = useState('페이지가 정상적으로 실행되었습니다. Phantom을 연결하세요.');
   const [busy, setBusy] = useState(false);
-  const [mintAddress, setMintAddress] = useState('');
 
-  const explorerUrl = useMemo(
-    () => mintAddress ? `https://explorer.solana.com/address/${mintAddress}?cluster=devnet` : '',
-    [mintAddress],
-  );
+  async function refreshBalance(address = wallet) {
+    if (!address) return;
+    const result = await rpc('getBalance', [address, { commitment: 'confirmed' }]);
+    setBalance(result.value / 1_000_000_000);
+  }
 
-  async function refreshBalance() {
-    if (!wallet.publicKey) return;
-    const lamports = await connection.getBalance(wallet.publicKey, 'confirmed');
-    setBalance(lamports / 1_000_000_000);
+  async function connect() {
+    try {
+      setBusy(true);
+      const provider = getProvider();
+      if (!provider) {
+        setStatus('Phantom이 감지되지 않았습니다. Phantom 앱의 브라우저에서 이 페이지를 열어주세요.');
+        return;
+      }
+      const result = await provider.connect();
+      const address = result.publicKey.toString();
+      setWallet(address);
+      setStatus('Phantom 연결 완료. Devnet 잔액을 확인했습니다.');
+      await refreshBalance(address);
+    } catch (error) {
+      setStatus(`Phantom 연결 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function airdrop() {
+    try {
+      if (!wallet) throw new Error('먼저 Phantom을 연결하세요.');
+      setBusy(true);
+      setStatus('Devnet SOL 에어드롭을 요청하고 있습니다…');
+      const signature = await rpc('requestAirdrop', [wallet, 1_000_000_000]);
+      for (let i = 0; i < 12; i += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        const result = await rpc('getSignatureStatuses', [[signature], { searchTransactionHistory: true }]);
+        const value = result.value?.[0];
+        if (value?.confirmationStatus === 'confirmed' || value?.confirmationStatus === 'finalized') break;
+      }
+      await refreshBalance(wallet);
+      setStatus(`에어드롭 요청 완료: ${signature}`);
+    } catch (error) {
+      setStatus(`에어드롭 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
+    } finally {
+      setBusy(false);
+    }
   }
 
   useEffect(() => {
-    if (wallet.connected && wallet.publicKey) {
-      refreshBalance().catch(() => setStatus('Devnet 잔액을 불러오지 못했습니다.'));
-      setStatus('Phantom 연결 완료. Devnet SOL 잔액을 확인하세요.');
-    } else {
-      setBalance(null);
-    }
-  }, [wallet.connected, wallet.publicKey]);
-
-  async function requestAirdrop() {
-    if (!wallet.publicKey) return;
-    try {
-      setBusy(true);
-      setStatus('Solana Devnet에서 1 SOL 에어드롭을 요청합니다…');
-      const signature = await connection.requestAirdrop(wallet.publicKey, 1_000_000_000);
-      const latest = await connection.getLatestBlockhash();
-      await connection.confirmTransaction({ signature, ...latest }, 'confirmed');
-      await refreshBalance();
-      setStatus('Devnet SOL 지급 완료. 이제 NFT를 발행할 수 있습니다.');
-    } catch (error) {
-      const message = error instanceof Error ? error.message : '에어드롭 실패';
-      setStatus(`에어드롭 실패: ${message}. 잠시 후 다시 시도하거나 공식 Faucet을 사용하세요.`);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function mintNft() {
-    if (!wallet.connected || !wallet.publicKey || !wallet.signTransaction) {
-      setStatus('먼저 Phantom을 연결하세요.');
-      return;
-    }
-    if ((balance ?? 0) <= 0) {
-      setStatus('Devnet SOL이 필요합니다. 먼저 에어드롭을 받으세요.');
-      return;
-    }
-
-    try {
-      setBusy(true);
-      setStatus('Phantom에서 NFT 발행을 승인하세요…');
-
-      const umi = createUmi('https://api.devnet.solana.com')
-        .use(mplTokenMetadata())
-        .use(walletAdapterIdentity(wallet));
-
-      const mint = generateSigner(umi);
-      await createNft(umi, {
-        mint,
-        name: name.trim() || 'AI Solana NFT #001',
-        uri: METADATA_URI,
-        sellerFeeBasisPoints: percentAmount(0),
-      }).sendAndConfirm(umi);
-
-      setMintAddress(mint.publicKey.toString());
-      await refreshBalance();
-      setStatus(`NFT 발행 완료: ${mint.publicKey.toString()}`);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'NFT 발행 실패';
-      setStatus(`NFT 발행 실패: ${message}`);
-    } finally {
-      setBusy(false);
-    }
-  }
+    const provider = getProvider();
+    provider?.connect({ onlyIfTrusted: true })
+      .then((result) => {
+        const address = result.publicKey.toString();
+        setWallet(address);
+        refreshBalance(address).catch(() => undefined);
+      })
+      .catch(() => undefined);
+  }, []);
 
   return (
     <main className="shell">
       <header className="hero">
         <span className="badge">Solana Devnet · Phantom</span>
         <h1>AI Solana NFT Agent</h1>
-        <p>AI가 NFT 정보를 준비하고, 사용자는 Phantom에서 최종 승인만 합니다.</p>
+        <p>먼저 Phantom 직접 연결과 Devnet SOL 흐름을 안정화한 버전입니다.</p>
       </header>
 
       <section className="card walletRow">
         <div>
           <h2>1. Phantom 연결</h2>
-          <p>{wallet.publicKey ? wallet.publicKey.toBase58() : 'Phantom 앱 브라우저에서 여는 것이 가장 안정적입니다.'}</p>
+          <p>{wallet || 'Phantom 앱 내부 브라우저에서 연결하세요.'}</p>
         </div>
-        <WalletMultiButton />
+        <button onClick={connect} disabled={busy}>{wallet ? '연결됨' : 'Phantom 연결'}</button>
       </section>
 
       <section className="grid">
         <article className="card preview">
-          <img src="./nft-image.svg" alt="NFT preview" />
-          <div><strong>{name}</strong><span>{description}</span></div>
+          <img src={`${import.meta.env.BASE_URL}nft-image.svg`} alt="NFT preview" />
+          <div><strong>닥터슬럼프 #001</strong><span>Solana Devnet 검증용 NFT</span></div>
         </article>
         <article className="card formCard">
-          <h2>2. NFT 정보</h2>
-          <label>NFT 이름<input value={name} onChange={(e) => setName(e.target.value)} /></label>
-          <label>설명<textarea rows={6} value={description} onChange={(e) => setDescription(e.target.value)} /></label>
+          <h2>2. Devnet 준비</h2>
           <div className="balance"><span>Devnet 잔액</span><strong>{balance === null ? '-' : `${balance.toFixed(4)} SOL`}</strong></div>
-          <button onClick={requestAirdrop} disabled={!wallet.connected || busy}>1 SOL 테스트 에어드롭</button>
+          <button onClick={airdrop} disabled={!wallet || busy}>1 SOL 테스트 에어드롭</button>
+          <button onClick={() => refreshBalance()} disabled={!wallet || busy}>잔액 새로고침</button>
         </article>
       </section>
 
       <section className="card actions">
         <h2>3. NFT 발행</h2>
-        <p>메타데이터는 GitHub Pages에 저장되며, Phantom 승인 후 Metaplex NFT가 생성됩니다.</p>
-        <button className="primary" onClick={mintNft} disabled={!wallet.connected || busy}>NFT 발행 승인</button>
+        <p>Phantom 연결과 에어드롭이 확인되면 다음 커밋에서 Metaplex 민팅을 다시 연결합니다.</p>
+        <button className="primary" disabled>NFT 발행 준비 중</button>
         <div className="status">{status}</div>
-        {explorerUrl && <a className="explorer" href={explorerUrl} target="_blank" rel="noreferrer">Solana Explorer에서 NFT 확인</a>}
       </section>
 
       <section className="notice">
-        <strong>보안</strong><p>복구 문구와 개인키는 어디에도 입력하지 않습니다. 모든 서명은 Phantom에서 직접 확인합니다.</p>
-        <strong>권리</strong><p>현재 이미지는 테스트넷 검증용입니다. 상업 유통 전에는 이미지와 캐릭터 권리를 확인해야 합니다.</p>
+        <strong>보안</strong><p>복구 문구와 개인키는 입력하지 않습니다. 지갑 연결은 Phantom에서만 승인합니다.</p>
       </section>
     </main>
   );
