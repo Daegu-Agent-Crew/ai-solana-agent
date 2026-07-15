@@ -36,12 +36,25 @@ function shortAddress(value) {
 function formatDate(value) {
   if (!value) return '-';
   return new Intl.DateTimeFormat('ko-KR', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   }).format(new Date(value));
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>'"]/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',
+  }[char]));
+}
+
+async function fetchMetadata(uri) {
+  if (!uri?.startsWith('https://')) return null;
+  try {
+    const response = await fetch(`${uri}${uri.includes('?') ? '&' : '?'}t=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
 }
 
 async function loadLatestNft() {
@@ -74,21 +87,32 @@ async function loadNftHistory() {
       return;
     }
 
-    galleryEl.innerHTML = history.map((nft) => {
+    const enriched = await Promise.all(history.map(async (nft) => ({
+      ...nft,
+      offchain: await fetchMetadata(nft.uri),
+    })));
+
+    galleryEl.innerHTML = enriched.map((nft) => {
       const explorer = nft.explorer || `https://explorer.solana.com/address/${nft.mint}?cluster=devnet`;
+      const image = nft.offchain?.image;
+      const description = nft.offchain?.description || '';
       return `
         <article class="nft-item">
-          <div>
-            <strong>${nft.name || 'Unnamed NFT'}</strong>
-            <p>${formatDate(nft.createdAt)}</p>
+          <div class="nft-thumb-wrap">
+            ${image ? `<img class="nft-thumb" src="${escapeHtml(image)}" alt="${escapeHtml(nft.name || 'NFT')}" loading="lazy" />` : '<div class="nft-thumb placeholder">No image</div>'}
           </div>
-          <code title="${nft.mint || ''}">${shortAddress(nft.mint)}</code>
-          <a href="${explorer}" target="_blank" rel="noreferrer">Explorer</a>
+          <div class="nft-copy">
+            <strong>${escapeHtml(nft.name || 'Unnamed NFT')}</strong>
+            <p>${formatDate(nft.createdAt)}</p>
+            ${description ? `<p class="description">${escapeHtml(description)}</p>` : ''}
+            <code title="${escapeHtml(nft.mint || '')}">${escapeHtml(shortAddress(nft.mint))}</code>
+          </div>
+          <a href="${escapeHtml(explorer)}" target="_blank" rel="noreferrer">Explorer</a>
         </article>`;
     }).join('');
   } catch (error) {
     galleryCountEl.textContent = '0';
-    galleryEl.innerHTML = `<p class="muted">${error.message || String(error)}</p>`;
+    galleryEl.innerHTML = `<p class="muted">${escapeHtml(error.message || String(error))}</p>`;
   }
 }
 
@@ -138,23 +162,14 @@ async function sendTestTransaction() {
     if (!provider || !publicKey) throw new Error('먼저 Phantom을 연결하세요.');
     setStatus('최신 블록해시로 테스트 트랜잭션 준비 중…', 'working');
     const latest = await connection.getLatestBlockhash('finalized');
-    const transaction = new solanaWeb3.Transaction({
-      feePayer: publicKey,
-      recentBlockhash: latest.blockhash,
-    }).add(
-      solanaWeb3.SystemProgram.transfer({
-        fromPubkey: publicKey,
-        toPubkey: publicKey,
-        lamports: 0,
-      }),
+    const transaction = new solanaWeb3.Transaction({ feePayer: publicKey, recentBlockhash: latest.blockhash }).add(
+      solanaWeb3.SystemProgram.transfer({ fromPubkey: publicKey, toPubkey: publicKey, lamports: 0 }),
     );
     setStatus('Phantom에서 트랜잭션을 승인하세요.', 'working');
     const signedTransaction = await provider.signTransaction(transaction);
     setStatus('서명된 트랜잭션 전송 중…', 'working');
     const signature = await connection.sendRawTransaction(signedTransaction.serialize(), {
-      skipPreflight: false,
-      preflightCommitment: 'confirmed',
-      maxRetries: 5,
+      skipPreflight: false, preflightCommitment: 'confirmed', maxRetries: 5,
     });
     explorerEl.href = `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
     explorerEl.classList.remove('hidden');
