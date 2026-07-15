@@ -22,7 +22,7 @@ Do not commit the token. Paste it only when `wrangler secret put GITHUB_TOKEN` a
 ## Test
 
 ```bash
-curl https://ai-solana-upload.<your-subdomain>.workers.dev/api/health
+curl https://ai-solana-upload.sfex11.workers.dev/api/health
 ```
 
 Expected response:
@@ -44,7 +44,7 @@ curl -X POST \
   -F 'symbol=AISOL' \
   -F 'description=Uploaded from a phone' \
   -F 'wallet=<SOLANA_WALLET>' \
-  https://ai-solana-upload.<your-subdomain>.workers.dev/api/upload
+  https://ai-solana-upload.sfex11.workers.dev/api/upload
 ```
 
 The response includes `imageUrl` and `metadataUri`. The frontend should use `metadataUri` for Phantom minting.

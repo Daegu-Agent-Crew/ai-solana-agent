@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#070a12" />
   <title>AI Solana Agent</title>
   <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./upload.css" />
 </head>
 <body>
   <main class="shell">
@@ -36,6 +37,16 @@
             심볼
             <input id="nftSymbol" maxlength="10" value="AISOL" required />
           </label>
+          <label>
+            NFT 이미지
+            <input id="nftImage" type="file" accept="image/jpeg,image/png,image/webp" />
+          </label>
+          <label>
+            설명
+            <textarea id="nftDescription" maxlength="500" rows="3" placeholder="이 NFT에 대한 설명을 입력하세요."></textarea>
+          </label>
+          <button id="uploadAsset" type="button">이미지 업로드 → 메타데이터 생성</button>
+          <p class="api-note">업로드 API: <code id="uploadApiUrl"></code></p>
           <label>
             메타데이터 JSON URI
             <input id="metadataUri" type="url" value="https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/metadata/doctor-slump-001.json" required />

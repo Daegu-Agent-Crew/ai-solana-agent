@@ -2,6 +2,8 @@
 
 Phantom 모바일 지갑으로 Solana Devnet에 NFT를 발행하는 MVP입니다.
 
+이미지 업로드 API는 `https://ai-solana-upload.sfex11.workers.dev`이며, 웹 화면의 `app.js`에서 이 주소를 호출해 GitHub 이미지와 메타데이터를 생성합니다.
+
 ## 목표
 
 1. Phantom 연결

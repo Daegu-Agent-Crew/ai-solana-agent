@@ -1,6 +1,8 @@
 name = "ai-solana-upload"
 main = "src/index.js"
 compatibility_date = "2026-07-15"
+workers_dev = true
+preview_urls = false
 
 [vars]
 GITHUB_OWNER = "Daegu-Agent-Crew"

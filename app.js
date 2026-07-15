@@ -4,6 +4,7 @@ import { createNft, mplTokenMetadata } from 'https://esm.sh/@metaplex-foundation
 import { walletAdapterIdentity } from 'https://esm.sh/@metaplex-foundation/umi-signer-wallet-adapters@1.2.0?bundle';
 
 const RPC = 'https://api.devnet.solana.com';
+const UPLOAD_API_URL = 'https://ai-solana-upload.sfex11.workers.dev';
 const connection = new solanaWeb3.Connection(RPC, 'confirmed');
 
 const walletEl = document.getElementById('wallet');
@@ -20,6 +21,10 @@ const isMutableEl = document.getElementById('isMutable');
 const mintPreviewEl = document.getElementById('mintPreview');
 const previewMessageEl = document.getElementById('previewMessage');
 const previewMetadataBtn = document.getElementById('previewMetadata');
+const nftImageEl = document.getElementById('nftImage');
+const nftDescriptionEl = document.getElementById('nftDescription');
+const uploadAssetBtn = document.getElementById('uploadAsset');
+const uploadApiUrlEl = document.getElementById('uploadApiUrl');
 const mintExplorerEl = document.getElementById('mintExplorer');
 const latestNftStatusEl = document.getElementById('latestNftStatus');
 const latestNftNameEl = document.getElementById('latestNftName');
@@ -32,6 +37,8 @@ let provider = null;
 let publicKey = null;
 let cachedMetadata = null;
 let minting = false;
+
+uploadApiUrlEl.textContent = UPLOAD_API_URL;
 
 function setStatus(message, kind = '') {
   statusEl.textContent = message;
@@ -101,6 +108,53 @@ async function previewMetadata() {
     cachedMetadata = null;
     previewMessageEl.textContent = error.message || String(error);
     setStatus(`미리보기 실패: ${error.message || error}`, 'error');
+  }
+}
+
+async function uploadAsset() {
+  const file = nftImageEl.files?.[0];
+  if (!file) {
+    setStatus('업로드할 JPG, PNG 또는 WebP 이미지를 선택하세요.', 'error');
+    return;
+  }
+
+  const name = nftNameEl.value.trim();
+  const symbol = nftSymbolEl.value.trim().toUpperCase();
+  if (!name || !symbol) {
+    setStatus('NFT 이름과 심볼을 먼저 입력하세요.', 'error');
+    return;
+  }
+
+  const form = new FormData();
+  form.append('file', file);
+  form.append('name', name);
+  form.append('symbol', symbol);
+  form.append('description', nftDescriptionEl.value.trim());
+  form.append('wallet', publicKey?.toString() || '');
+
+  uploadAssetBtn.disabled = true;
+  uploadAssetBtn.textContent = 'GitHub에 업로드 중…';
+  setStatus('이미지 검사와 메타데이터 생성을 진행 중입니다…', 'working');
+
+  try {
+    const response = await fetch(`${UPLOAD_API_URL}/api/upload`, {
+      method: 'POST',
+      body: form,
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.metadataUri) {
+      throw new Error(result.error || `업로드 실패: HTTP ${response.status}`);
+    }
+
+    metadataUriEl.value = result.metadataUri;
+    cachedMetadata = null;
+    await previewMetadata();
+    setStatus('업로드 완료. 생성된 메타데이터로 NFT를 발행할 수 있습니다.', 'success');
+  } catch (error) {
+    setStatus(`이미지 업로드 실패: ${error.message || error}`, 'error');
+  } finally {
+    uploadAssetBtn.disabled = false;
+    uploadAssetBtn.textContent = '이미지 업로드 → 메타데이터 생성';
   }
 }
 
@@ -230,6 +284,7 @@ async function loadNftHistory() {
 connectBtn.addEventListener('click', handleConnectClick);
 refreshBtn.addEventListener('click', refreshBalance);
 previewMetadataBtn.addEventListener('click', previewMetadata);
+uploadAssetBtn.addEventListener('click', uploadAsset);
 mintForm.addEventListener('submit', mintWithConnectedWallet);
 metadataUriEl.addEventListener('change', () => { cachedMetadata = null; });
 
