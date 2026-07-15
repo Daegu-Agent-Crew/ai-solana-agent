@@ -1,0 +1,18 @@
+{
+  "name": "닥터슬럼프 #001",
+  "symbol": "AINFT",
+  "description": "사막 디오라마를 배경으로 한 AI 팬아트 스타일 컬렉터 이미지. Solana Devnet 검증용 NFT입니다.",
+  "image": "https://daegu-agent-crew.github.io/ai-solana-agent/nft-image.svg",
+  "external_url": "https://daegu-agent-crew.github.io/ai-solana-agent/",
+  "attributes": [
+    { "trait_type": "Edition", "value": "001" },
+    { "trait_type": "Network", "value": "Solana Devnet" },
+    { "trait_type": "Type", "value": "AI Collector Artwork" }
+  ],
+  "properties": {
+    "files": [
+      { "uri": "https://daegu-agent-crew.github.io/ai-solana-agent/nft-image.svg", "type": "image/svg+xml" }
+    ],
+    "category": "image"
+  }
+}
