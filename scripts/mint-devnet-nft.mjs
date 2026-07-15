@@ -47,6 +47,15 @@ if (!Array.isArray(bytes) || bytes.length !== 64) {
   throw new Error('DEVNET_AGENT_KEYPAIR must be a JSON array of 64 integers.');
 }
 
+const metadataResponse = await fetch(metadataUri, { cache: 'no-store' });
+if (!metadataResponse.ok) {
+  throw new Error(`Metadata fetch failed before minting: HTTP ${metadataResponse.status}`);
+}
+const offchainMetadata = await metadataResponse.json();
+const image = typeof offchainMetadata.image === 'string' ? offchainMetadata.image : '';
+const description = typeof offchainMetadata.description === 'string' ? offchainMetadata.description : '';
+const attributes = Array.isArray(offchainMetadata.attributes) ? offchainMetadata.attributes : [];
+
 const secretBytes = Uint8Array.from(bytes);
 const web3Keypair = Keypair.fromSecretKey(secretBytes);
 const connection = new Connection(RPC, 'confirmed');
@@ -121,6 +130,9 @@ const report = {
   name: asset?.metadata.name || name,
   symbol: asset?.metadata.symbol || symbol,
   uri: asset?.metadata.uri || metadataUri,
+  image,
+  description,
+  attributes,
   isMutable,
   verifiedByFetch: Boolean(asset),
   verificationWarning: asset ? '' : verificationWarning,
@@ -143,6 +155,7 @@ fs.writeFileSync(
     `- Symbol: ${report.symbol}\n` +
     `- Mutable: ${report.isMutable}\n` +
     `- URI: ${report.uri}\n` +
+    `- Image: ${report.image || '-'}\n` +
     `- Explorer: ${report.explorer}\n` +
     (report.verificationWarning ? `- Verification warning: ${report.verificationWarning}\n` : ''),
 );
