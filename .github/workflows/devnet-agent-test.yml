@@ -64,6 +64,9 @@ jobs:
       - name: Devnet network and wallet check
         run: npm run agent:check
 
+      - name: Validate metadata JSON and image
+        run: npm run agent:metadata
+
       - name: Mint Metaplex Devnet NFT with retries
         shell: bash
         run: |
