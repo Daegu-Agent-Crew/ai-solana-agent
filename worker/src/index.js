@@ -191,16 +191,26 @@ async function githubCreateFile(env, path, contentBase64, message) {
   return body;
 }
 
-async function waitUntilPublic(url, expectedType, attempts = 8) {
+export async function waitUntilPublic(url, expectedType, attempts = 8) {
   let lastStatus = 0;
+  let lastType = '';
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     const response = await fetch(`${url}?v=${Date.now()}`, { headers: { 'Cache-Control': 'no-cache' } }).catch(() => null);
     lastStatus = response?.status || 0;
     const type = response?.headers.get('content-type') || '';
-    if (response?.ok && (!expectedType || type.includes(expectedType))) return { status: response.status, type };
-    await new Promise((resolve) => setTimeout(resolve, Math.min(attempt * 750, 3000)));
+    lastType = type;
+    if (response?.ok) {
+      if (!expectedType || type.includes(expectedType)) return { status: response.status, type };
+      if (expectedType === 'application/json') {
+        const body = await response.clone().json().catch(() => null);
+        if (body && typeof body === 'object') return { status: response.status, type };
+      }
+    }
+    if (attempt < attempts) {
+      await new Promise((resolve) => setTimeout(resolve, Math.min(attempt * 750, 3000)));
+    }
   }
-  throw new Error(`Uploaded file is not publicly available yet: HTTP ${lastStatus}`);
+  throw new Error(`Uploaded file is not publicly available yet: HTTP ${lastStatus}, Content-Type ${lastType || 'unknown'}`);
 }
 
 async function handleUpload(request, env, origin) {
