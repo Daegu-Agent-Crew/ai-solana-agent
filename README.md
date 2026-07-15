@@ -17,3 +17,5 @@ Phantom 모바일 지갑으로 Solana Devnet에 NFT를 발행하는 MVP입니다
 ## 배포
 
 `main` 브랜치에 push되면 GitHub Actions가 GitHub Pages로 자동 배포합니다.
+
+_Last deployment trigger: 2026-07-15_
