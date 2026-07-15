@@ -1,0 +1,21 @@
+{
+  "name": "Cloudflare Upload Test",
+  "symbol": "TEST",
+  "description": "Cloudflare Worker end-to-end upload verification",
+  "image": "https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/uploads/images/d126d616641d42ac8b0a07ec302c9fa1.png",
+  "attributes": [
+    {
+      "trait_type": "Network",
+      "value": "Devnet"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/uploads/images/d126d616641d42ac8b0a07ec302c9fa1.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image"
+  }
+}
