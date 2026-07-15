@@ -12,6 +12,8 @@ const latestNftStatusEl = document.getElementById('latestNftStatus');
 const latestNftNameEl = document.getElementById('latestNftName');
 const latestNftMintEl = document.getElementById('latestNftMint');
 const latestNftExplorerEl = document.getElementById('latestNftExplorer');
+const galleryEl = document.getElementById('nftGallery');
+const galleryCountEl = document.getElementById('galleryCount');
 
 let provider = null;
 let publicKey = null;
@@ -24,6 +26,22 @@ function setStatus(message, kind = '') {
 function getProvider() {
   const candidate = window.phantom?.solana || window.solana;
   return candidate?.isPhantom ? candidate : null;
+}
+
+function shortAddress(value) {
+  if (!value || value.length < 14) return value || '-';
+  return `${value.slice(0, 7)}…${value.slice(-7)}`;
+}
+
+function formatDate(value) {
+  if (!value) return '-';
+  return new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(value));
 }
 
 async function loadLatestNft() {
@@ -40,6 +58,37 @@ async function loadLatestNft() {
   } catch (error) {
     latestNftStatusEl.textContent = '대기 중';
     latestNftNameEl.textContent = error.message || String(error);
+  }
+}
+
+async function loadNftHistory() {
+  try {
+    const response = await fetch(`./nft-history.json?t=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) throw new Error('민팅 이력이 아직 없습니다.');
+    const history = await response.json();
+    if (!Array.isArray(history)) throw new Error('민팅 이력 형식이 올바르지 않습니다.');
+
+    galleryCountEl.textContent = String(history.length);
+    if (history.length === 0) {
+      galleryEl.innerHTML = '<p class="muted">민팅 이력이 아직 없습니다.</p>';
+      return;
+    }
+
+    galleryEl.innerHTML = history.map((nft) => {
+      const explorer = nft.explorer || `https://explorer.solana.com/address/${nft.mint}?cluster=devnet`;
+      return `
+        <article class="nft-item">
+          <div>
+            <strong>${nft.name || 'Unnamed NFT'}</strong>
+            <p>${formatDate(nft.createdAt)}</p>
+          </div>
+          <code title="${nft.mint || ''}">${shortAddress(nft.mint)}</code>
+          <a href="${explorer}" target="_blank" rel="noreferrer">Explorer</a>
+        </article>`;
+    }).join('');
+  } catch (error) {
+    galleryCountEl.textContent = '0';
+    galleryEl.innerHTML = `<p class="muted">${error.message || String(error)}</p>`;
   }
 }
 
@@ -123,7 +172,7 @@ refreshBtn.addEventListener('click', refreshBalance);
 testTxBtn.addEventListener('click', sendTestTransaction);
 
 window.addEventListener('load', async () => {
-  await loadLatestNft();
+  await Promise.all([loadLatestNft(), loadNftHistory()]);
   provider = getProvider();
   if (!provider) return;
   try {
