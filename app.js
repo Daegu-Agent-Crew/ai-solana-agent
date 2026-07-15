@@ -8,6 +8,10 @@ const connectBtn = document.getElementById('connect');
 const refreshBtn = document.getElementById('refresh');
 const testTxBtn = document.getElementById('testTx');
 const explorerEl = document.getElementById('explorer');
+const latestNftStatusEl = document.getElementById('latestNftStatus');
+const latestNftNameEl = document.getElementById('latestNftName');
+const latestNftMintEl = document.getElementById('latestNftMint');
+const latestNftExplorerEl = document.getElementById('latestNftExplorer');
 
 let provider = null;
 let publicKey = null;
@@ -20,6 +24,23 @@ function setStatus(message, kind = '') {
 function getProvider() {
   const candidate = window.phantom?.solana || window.solana;
   return candidate?.isPhantom ? candidate : null;
+}
+
+async function loadLatestNft() {
+  try {
+    const response = await fetch(`./latest-nft.json?t=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) throw new Error('아직 공개된 자동 민팅 결과가 없습니다.');
+    const nft = await response.json();
+    if (!nft.ok || !nft.mint) throw new Error('NFT 결과 형식이 올바르지 않습니다.');
+    latestNftStatusEl.textContent = 'PASS';
+    latestNftNameEl.textContent = nft.name || '-';
+    latestNftMintEl.textContent = nft.mint;
+    latestNftExplorerEl.href = nft.explorer || `https://explorer.solana.com/address/${nft.mint}?cluster=devnet`;
+    latestNftExplorerEl.classList.remove('hidden');
+  } catch (error) {
+    latestNftStatusEl.textContent = '대기 중';
+    latestNftNameEl.textContent = error.message || String(error);
+  }
 }
 
 async function refreshBalance() {
@@ -37,10 +58,7 @@ async function refreshBalance() {
 async function connectWallet() {
   try {
     provider = getProvider();
-    if (!provider) {
-      throw new Error('Phantom 앱 내부 브라우저에서 페이지를 열어주세요.');
-    }
-
+    if (!provider) throw new Error('Phantom 앱 내부 브라우저에서 페이지를 열어주세요.');
     setStatus('Phantom 연결 승인 대기 중…', 'working');
     const result = await provider.connect();
     publicKey = result.publicKey;
@@ -57,16 +75,10 @@ async function connectWallet() {
 async function waitForConfirmation(signature, timeoutMs = 45000) {
   const startedAt = Date.now();
   while (Date.now() - startedAt < timeoutMs) {
-    const result = await connection.getSignatureStatuses([signature], {
-      searchTransactionHistory: true,
-    });
+    const result = await connection.getSignatureStatuses([signature], { searchTransactionHistory: true });
     const status = result.value[0];
-    if (status?.err) {
-      throw new Error(`트랜잭션 오류: ${JSON.stringify(status.err)}`);
-    }
-    if (status?.confirmationStatus === 'confirmed' || status?.confirmationStatus === 'finalized') {
-      return;
-    }
+    if (status?.err) throw new Error(`트랜잭션 오류: ${JSON.stringify(status.err)}`);
+    if (status?.confirmationStatus === 'confirmed' || status?.confirmationStatus === 'finalized') return;
     await new Promise((resolve) => setTimeout(resolve, 1200));
   }
   throw new Error('확인 시간이 초과되었습니다. Explorer에서 서명 상태를 확인하세요.');
@@ -75,7 +87,6 @@ async function waitForConfirmation(signature, timeoutMs = 45000) {
 async function sendTestTransaction() {
   try {
     if (!provider || !publicKey) throw new Error('먼저 Phantom을 연결하세요.');
-
     setStatus('최신 블록해시로 테스트 트랜잭션 준비 중…', 'working');
     const latest = await connection.getLatestBlockhash('finalized');
     const transaction = new solanaWeb3.Transaction({
@@ -88,23 +99,18 @@ async function sendTestTransaction() {
         lamports: 0,
       }),
     );
-
     setStatus('Phantom에서 트랜잭션을 승인하세요.', 'working');
     const signedTransaction = await provider.signTransaction(transaction);
-
     setStatus('서명된 트랜잭션 전송 중…', 'working');
     const signature = await connection.sendRawTransaction(signedTransaction.serialize(), {
       skipPreflight: false,
       preflightCommitment: 'confirmed',
       maxRetries: 5,
     });
-
     explorerEl.href = `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
     explorerEl.classList.remove('hidden');
-
     setStatus('Devnet 확인 중…', 'working');
     await waitForConfirmation(signature);
-
     setStatus(`테스트 트랜잭션 성공: ${signature}`, 'success');
     await refreshBalance();
   } catch (error) {
@@ -117,6 +123,7 @@ refreshBtn.addEventListener('click', refreshBalance);
 testTxBtn.addEventListener('click', sendTestTransaction);
 
 window.addEventListener('load', async () => {
+  await loadLatestNft();
   provider = getProvider();
   if (!provider) return;
   try {
