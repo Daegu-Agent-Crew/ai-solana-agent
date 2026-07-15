@@ -19,10 +19,20 @@ on:
         required: false
         default: 'AISOL'
         type: string
-      metadata_uri:
-        description: 'Public HTTPS metadata JSON URI'
+      image_url:
+        description: 'Public HTTPS image URL'
         required: false
-        default: 'https://daegu-agent-crew.github.io/ai-solana-agent/metadata/doctor-slump-001.json'
+        default: 'https://daegu-agent-crew.github.io/ai-solana-agent/assets/ai-agent-nft.svg'
+        type: string
+      description:
+        description: 'NFT description'
+        required: false
+        default: 'Created by the AI Solana Agent on Devnet.'
+        type: string
+      attributes_json:
+        description: 'JSON array, e.g. [{"trait_type":"Type","value":"Agent"}]'
+        required: false
+        default: '[{"trait_type":"Network","value":"Devnet"}]'
         type: string
       is_mutable:
         description: 'Allow metadata updates after minting'
@@ -46,7 +56,9 @@ jobs:
       DEVNET_AGENT_KEYPAIR: ${{ secrets.DEVNET_AGENT_KEYPAIR }}
       NFT_NAME: ${{ github.event_name == 'workflow_dispatch' && inputs.nft_name || '' }}
       NFT_SYMBOL: ${{ github.event_name == 'workflow_dispatch' && inputs.nft_symbol || 'AISOL' }}
-      NFT_METADATA_URI: ${{ github.event_name == 'workflow_dispatch' && inputs.metadata_uri || 'https://daegu-agent-crew.github.io/ai-solana-agent/metadata/doctor-slump-001.json' }}
+      NFT_IMAGE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.image_url || 'https://daegu-agent-crew.github.io/ai-solana-agent/assets/ai-agent-nft.svg' }}
+      NFT_DESCRIPTION: ${{ github.event_name == 'workflow_dispatch' && inputs.description || 'Created by the AI Solana Agent on Devnet.' }}
+      NFT_ATTRIBUTES_JSON: ${{ github.event_name == 'workflow_dispatch' && inputs.attributes_json || '[{"trait_type":"Network","value":"Devnet"}]' }}
       NFT_IS_MUTABLE: ${{ github.event_name == 'workflow_dispatch' && inputs.is_mutable || false }}
     steps:
       - uses: actions/checkout@v4
@@ -64,6 +76,38 @@ jobs:
       - name: Devnet network and wallet check
         run: npm run agent:check
 
+      - name: Generate and publish metadata JSON
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE_ID="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          FILE_PATH="metadata/generated/${FILE_ID}.json"
+          mkdir -p metadata/generated
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const filePath = `metadata/generated/${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}.json`;
+          const name = process.env.NFT_NAME || `AI Agent #${Date.now().toString().slice(-10)}`;
+          const symbol = process.env.NFT_SYMBOL || 'AISOL';
+          const image = process.env.NFT_IMAGE_URL;
+          const description = process.env.NFT_DESCRIPTION || '';
+          if (Buffer.byteLength(name, 'utf8') > 32) throw new Error('NFT name exceeds 32 UTF-8 bytes.');
+          if (Buffer.byteLength(symbol, 'utf8') > 10) throw new Error('NFT symbol exceeds 10 UTF-8 bytes.');
+          if (!image?.startsWith('https://')) throw new Error('Image URL must use HTTPS.');
+          let attributes;
+          try { attributes = JSON.parse(process.env.NFT_ATTRIBUTES_JSON || '[]'); }
+          catch { throw new Error('attributes_json must be valid JSON.'); }
+          if (!Array.isArray(attributes)) throw new Error('attributes_json must be a JSON array.');
+          const metadata = { name, symbol, description, image, attributes, properties: { category: 'image', files: [{ uri: image, type: image.endsWith('.svg') ? 'image/svg+xml' : 'image/*' }] } };
+          fs.writeFileSync(filePath, JSON.stringify(metadata, null, 2) + '\n');
+          NODE
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$FILE_PATH"
+          git commit -m "Add generated NFT metadata [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
+          echo "NFT_METADATA_URI=https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/${FILE_PATH}" >> "$GITHUB_ENV"
+
       - name: Validate metadata JSON and image
         run: npm run agent:metadata
 
@@ -77,9 +121,7 @@ jobs:
             if npm run agent:nft 2>&1 | tee "reports/nft-attempt-${attempt}.log"; then
               exit 0
             fi
-            if [ "$attempt" -lt 3 ]; then
-              sleep $((attempt * 10))
-            fi
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt * 10)); fi
           done
           exit 1
 
@@ -103,10 +145,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f latest-nft.json nft-history.json
-          if git diff --cached --quiet; then
-            echo "NFT result files unchanged"
-            exit 0
-          fi
+          if git diff --cached --quiet; then exit 0; fi
           git commit -m "Archive Devnet NFT mint result [skip ci]"
           git pull --rebase origin main
           git push origin HEAD:main
@@ -115,10 +154,7 @@ jobs:
         if: always()
         run: |
           for report in reports/*.md; do
-            if [ -f "$report" ]; then
-              cat "$report" >> "$GITHUB_STEP_SUMMARY"
-              echo '' >> "$GITHUB_STEP_SUMMARY"
-            fi
+            if [ -f "$report" ]; then cat "$report" >> "$GITHUB_STEP_SUMMARY"; echo '' >> "$GITHUB_STEP_SUMMARY"; fi
           done
           if ls reports/nft-attempt-*.log >/dev/null 2>&1; then
             echo '## NFT attempt logs' >> "$GITHUB_STEP_SUMMARY"
