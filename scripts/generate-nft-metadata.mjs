@@ -1,14 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const name = (process.env.NFT_NAME || 'AI Agent NFT').trim();
+const name = (process.env.NFT_NAME || `AI Agent #${Date.now().toString().slice(-10)}`).trim();
 const symbol = (process.env.NFT_SYMBOL || 'AISOL').trim();
 const description = (process.env.NFT_DESCRIPTION || 'Created by the AI Solana Agent on Devnet.').trim();
-const image = (process.env.NFT_IMAGE_URL || 'https://daegu-agent-crew.github.io/ai-solana-agent/assets/ai-agent-nft.svg').trim();
-const rawAttributes = (process.env.NFT_ATTRIBUTES || '[{"trait_type":"Network","value":"Devnet"}]').trim();
-const runNumber = process.env.GITHUB_RUN_NUMBER || Date.now().toString();
-const fileName = `${Date.now()}-${runNumber}.json`;
-const outputPath = path.join('metadata', 'generated', fileName);
+const image = (process.env.NFT_IMAGE_URL || 'https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/assets/ai-agent-nft.svg').trim();
+const rawAttributes = (process.env.NFT_ATTRIBUTES_JSON || process.env.NFT_ATTRIBUTES || '[{"trait_type":"Network","value":"Devnet"}]').trim();
+const runId = process.env.GITHUB_RUN_ID || Date.now().toString();
+const runAttempt = process.env.GITHUB_RUN_ATTEMPT || '1';
+const outputPath = path.join('metadata', 'generated', `${runId}-${runAttempt}.json`);
 
 if (Buffer.byteLength(name, 'utf8') > 32) throw new Error('NFT_NAME exceeds 32 UTF-8 bytes.');
 if (Buffer.byteLength(symbol, 'utf8') > 10) throw new Error('NFT_SYMBOL exceeds 10 UTF-8 bytes.');
@@ -18,9 +18,9 @@ let attributes;
 try {
   attributes = JSON.parse(rawAttributes);
 } catch {
-  throw new Error('NFT_ATTRIBUTES must be valid JSON.');
+  throw new Error('NFT_ATTRIBUTES_JSON must be valid JSON.');
 }
-if (!Array.isArray(attributes)) throw new Error('NFT_ATTRIBUTES must be a JSON array.');
+if (!Array.isArray(attributes)) throw new Error('NFT_ATTRIBUTES_JSON must be a JSON array.');
 
 const metadata = {
   name,
@@ -29,7 +29,7 @@ const metadata = {
   image,
   attributes,
   properties: {
-    files: [{ uri: image, type: image.endsWith('.svg') ? 'image/svg+xml' : 'image/*' }],
+    files: [{ uri: image, type: image.toLowerCase().endsWith('.svg') ? 'image/svg+xml' : 'image/*' }],
     category: 'image',
   },
 };
