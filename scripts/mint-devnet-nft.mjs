@@ -16,13 +16,31 @@ import {
 
 const RPC = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
 const SECRET = process.env.DEVNET_AGENT_KEYPAIR;
-const METADATA_URI = process.env.NFT_METADATA_URI ||
-  'https://daegu-agent-crew.github.io/ai-solana-agent/metadata/doctor-slump-001.json';
+const defaultName = `AI Agent #${Date.now().toString().slice(-10)}`;
+const name = (process.env.NFT_NAME || defaultName).trim();
+const symbol = (process.env.NFT_SYMBOL || 'AISOL').trim().toUpperCase();
+const metadataUri = (process.env.NFT_METADATA_URI ||
+  'https://daegu-agent-crew.github.io/ai-solana-agent/metadata/doctor-slump-001.json').trim();
+const isMutable = String(process.env.NFT_IS_MUTABLE || 'false').toLowerCase() === 'true';
 
 if (!RPC.toLowerCase().includes('devnet')) {
   throw new Error(`Safety stop: only Devnet RPC is allowed. Received: ${RPC}`);
 }
 if (!SECRET) throw new Error('DEVNET_AGENT_KEYPAIR is required.');
+if (!name) throw new Error('NFT_NAME cannot be empty.');
+if (Buffer.byteLength(name, 'utf8') > 32) {
+  throw new Error(`NFT name exceeds Metaplex 32-byte limit: ${name}`);
+}
+if (!symbol) throw new Error('NFT_SYMBOL cannot be empty.');
+if (Buffer.byteLength(symbol, 'utf8') > 10) {
+  throw new Error(`NFT symbol exceeds Metaplex 10-byte limit: ${symbol}`);
+}
+if (!metadataUri.startsWith('https://')) {
+  throw new Error('NFT_METADATA_URI must use HTTPS.');
+}
+if (Buffer.byteLength(metadataUri, 'utf8') > 200) {
+  throw new Error('NFT_METADATA_URI exceeds the 200-byte limit.');
+}
 
 const bytes = JSON.parse(SECRET);
 if (!Array.isArray(bytes) || bytes.length !== 64) {
@@ -58,28 +76,24 @@ const umi = createUmi(RPC).use(mplTokenMetadata());
 const keypair = umi.eddsa.createKeypairFromSecretKey(secretBytes);
 const identity = createSignerFromKeypair(umi, keypair);
 umi.use(signerIdentity(identity));
-
 const mint = generateSigner(umi);
-const name = `AI Agent #${Date.now().toString().slice(-10)}`;
-
-if (Buffer.byteLength(name, 'utf8') > 32) {
-  throw new Error(`NFT name exceeds Metaplex 32-byte limit: ${name}`);
-}
 
 console.log(`RPC: ${RPC}`);
 console.log(`Agent wallet: ${identity.publicKey}`);
 console.log(`Balance: ${(balance / LAMPORTS_PER_SOL).toFixed(6)} SOL`);
-console.log(`Metadata URI: ${METADATA_URI}`);
 console.log(`NFT name: ${name}`);
+console.log(`NFT symbol: ${symbol}`);
+console.log(`Metadata URI: ${metadataUri}`);
+console.log(`Mutable: ${isMutable}`);
 console.log(`Mint candidate: ${mint.publicKey}`);
 
 const result = await createNft(umi, {
   mint,
   name,
-  symbol: 'AISOL',
-  uri: METADATA_URI,
+  symbol,
+  uri: metadataUri,
   sellerFeeBasisPoints: percentAmount(0),
-  isMutable: false,
+  isMutable,
 }).sendAndConfirm(umi, { confirm: { commitment: 'confirmed' } });
 
 const metadataPda = findMetadataPda(umi, { mint: mint.publicKey })[0];
@@ -105,8 +119,9 @@ const report = {
   mint: mint.publicKey.toString(),
   metadata: asset?.metadata.publicKey.toString() || metadataPda.toString(),
   name: asset?.metadata.name || name,
-  symbol: asset?.metadata.symbol || 'AISOL',
-  uri: asset?.metadata.uri || METADATA_URI,
+  symbol: asset?.metadata.symbol || symbol,
+  uri: asset?.metadata.uri || metadataUri,
+  isMutable,
   verifiedByFetch: Boolean(asset),
   verificationWarning: asset ? '' : verificationWarning,
   signatureBytes: Array.from(result.signature),
@@ -126,6 +141,7 @@ fs.writeFileSync(
     `- Metadata fetch verified: ${report.verifiedByFetch}\n` +
     `- Name: ${report.name}\n` +
     `- Symbol: ${report.symbol}\n` +
+    `- Mutable: ${report.isMutable}\n` +
     `- URI: ${report.uri}\n` +
     `- Explorer: ${report.explorer}\n` +
     (report.verificationWarning ? `- Verification warning: ${report.verificationWarning}\n` : ''),
