@@ -13,7 +13,7 @@
     <header class="hero">
       <span class="badge">Solana Devnet · Phantom NFT Mint</span>
       <h1>AI Solana Agent</h1>
-      <p>Phantom 지갑을 연결하고 Devnet에서 새로운 NFT를 직접 발행합니다.</p>
+      <p>휴대폰에서 이미지를 선택하고 Phantom으로 바로 NFT를 발행합니다.</p>
     </header>
 
     <section class="card mint-card">
@@ -25,7 +25,7 @@
       <div class="mint-layout">
         <div class="preview-panel">
           <img id="mintPreview" class="mint-preview" src="./assets/ai-agent-nft.svg" alt="NFT 미리보기" />
-          <p id="previewMessage" class="muted">메타데이터를 불러오는 중…</p>
+          <p id="previewMessage" class="muted">이미지를 선택하면 바로 미리볼 수 있습니다.</p>
         </div>
 
         <form id="mintForm" class="mint-form">
@@ -45,7 +45,7 @@
             설명
             <textarea id="nftDescription" maxlength="500" rows="3" placeholder="이 NFT에 대한 설명을 입력하세요."></textarea>
           </label>
-          <button id="uploadAsset" type="button">이미지 업로드 → 메타데이터 생성</button>
+          <button id="uploadAsset" type="button">이미지만 먼저 업로드</button>
           <p class="api-note">업로드 API: <code id="uploadApiUrl"></code></p>
           <label>
             메타데이터 JSON URI
@@ -56,7 +56,7 @@
             발행 후 메타데이터 수정 허용
           </label>
           <button id="previewMetadata" type="button">메타데이터 미리보기</button>
-          <button id="mintNft" type="submit" class="primary">Phantom 연결 후 NFT 발행</button>
+          <button id="mintNft" type="submit" class="primary">이미지 업로드 + Phantom NFT 발행</button>
           <a id="mintExplorer" class="explorer hidden" target="_blank" rel="noreferrer">Explorer에서 새 NFT 확인</a>
         </form>
       </div>
@@ -101,6 +101,7 @@
 
   <script src="https://unpkg.com/@solana/web3.js@1.98.4/lib/index.iife.min.js"></script>
   <script type="module" src="./app.js"></script>
+  <script type="module" src="./one-click-mint.js"></script>
   <script type="module" src="./user-mints.js"></script>
 </body>
 </html>
