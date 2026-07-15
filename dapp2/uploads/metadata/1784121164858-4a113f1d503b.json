@@ -1,0 +1,33 @@
+{
+  "name": "AI Agent NFT",
+  "symbol": "AISOL",
+  "description": "닥터슬럼프 응용 이미지",
+  "image": "https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/uploads/images/1784121164858-4a113f1d503b.jpg",
+  "attributes": [
+    {
+      "trait_type": "Network",
+      "value": "Solana Devnet"
+    },
+    {
+      "trait_type": "Storage",
+      "value": "GitHub"
+    },
+    {
+      "trait_type": "Uploader Wallet",
+      "value": "FWmGGKtczrdtWQJNdimApAfzBxEKdoDFwCFQtP9DEB5i"
+    },
+    {
+      "trait_type": "SHA-256",
+      "value": "4a113f1d503b38ac3c71471978a9b03bb7c8818dc686f1fca3bf4514901f82e0"
+    }
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/uploads/images/1784121164858-4a113f1d503b.jpg",
+        "type": "image/jpeg"
+      }
+    ]
+  }
+}

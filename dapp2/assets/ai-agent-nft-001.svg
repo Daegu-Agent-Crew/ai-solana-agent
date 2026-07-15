@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" role="img" aria-labelledby="title desc">
+  <title id="title">AI Solana Agent NFT</title>
+  <desc id="desc">A neon Solana-inspired agent emblem on a dark background.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#050816"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="sol" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9945ff"/>
+      <stop offset="0.5" stop-color="#14f195"/>
+      <stop offset="1" stop-color="#00c2ff"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="18" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1200" height="1200" rx="90" fill="url(#bg)"/>
+  <circle cx="600" cy="540" r="300" fill="#0b1220" stroke="url(#sol)" stroke-width="18" filter="url(#glow)"/>
+  <path d="M410 455h380l-58 72H352zM468 565h380l-58 72H410zM410 675h380l-58 72H352z" fill="url(#sol)"/>
+  <circle cx="500" cy="395" r="22" fill="#14f195"/>
+  <circle cx="700" cy="395" r="22" fill="#9945ff"/>
+  <path d="M500 395h200" stroke="url(#sol)" stroke-width="12" stroke-linecap="round"/>
+  <text x="600" y="930" text-anchor="middle" fill="#f8fafc" font-family="Arial, Helvetica, sans-serif" font-size="66" font-weight="700">AI SOLANA AGENT</text>
+  <text x="600" y="1000" text-anchor="middle" fill="#94a3b8" font-family="Arial, Helvetica, sans-serif" font-size="34">DEVNET GENESIS EDITION</text>
+</svg>

@@ -4,104 +4,53 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#070a12" />
-  <title>AI Solana Agent</title>
+  <title>Solana DApp Trio — 출석 · NFT 쿠폰 · 크레딧</title>
   <link rel="stylesheet" href="./styles.css" />
-  <link rel="stylesheet" href="./upload.css" />
 </head>
 <body>
   <main class="shell">
     <header class="hero">
-      <span class="badge">Solana Devnet · Phantom NFT Mint</span>
-      <h1>AI Solana Agent</h1>
-      <p>휴대폰에서 이미지를 선택하고 Phantom으로 바로 NFT를 발행합니다.</p>
+      <span class="badge">Solana Devnet · Phantom</span>
+      <h1>Solana DApp Trio</h1>
+      <p>출석, NFT 쿠폰, 로컬 크레딧 — 3개 DApp 포트폴리오</p>
     </header>
 
-    <section class="card">
-      <h2>Phantom 지갑</h2>
-      <p id="wallet">연결되지 않음</p>
-      <div class="row"><span>Devnet 잔액</span><strong id="balance">-</strong></div>
-      <button id="connect">Phantom 연결</button>
-      <button id="refresh" disabled>잔액 새로고침</button>
-    </section>
+    <section class="card hub-grid">
+      <a href="./dapp1/" class="hub-card">
+        <div class="hub-icon">📅</div>
+        <h2>DApp 1 — 출석</h2>
+        <p>당일 출석 체크, 누적 출석 수, 참여자 랭킹</p>
+        <span class="hub-link">출석하기 →</span>
+      </a>
 
-    <section class="card mint-card">
-      <div class="section-title">
-        <h2>새 NFT 발행</h2>
-        <span class="count">Devnet</span>
-      </div>
+      <a href="./dapp2/" class="hub-card">
+        <div class="hub-icon">🎫</div>
+        <h2>DApp 2 — NFT 쿠폰</h2>
+        <p>NFT 쿠폰 발행, 민팅, 사용 처리, 권한 관리</p>
+        <span class="hub-link">쿠폰 발행 →</span>
+      </a>
 
-      <div class="mint-layout">
-        <div class="preview-panel">
-          <img id="mintPreview" class="mint-preview" src="./assets/ai-agent-nft.svg" alt="NFT 미리보기" />
-          <p id="previewMessage" class="muted">이미지를 선택하면 바로 미리볼 수 있습니다.</p>
-        </div>
-
-        <form id="mintForm" class="mint-form">
-          <label>
-            NFT 이름
-            <input id="nftName" maxlength="32" value="AI Agent NFT" required />
-          </label>
-          <label>
-            심볼
-            <input id="nftSymbol" maxlength="10" value="AISOL" required />
-          </label>
-          <label>
-            NFT 이미지
-            <input id="nftImage" type="file" accept="image/jpeg,image/png,image/webp" />
-          </label>
-          <label>
-            설명
-            <textarea id="nftDescription" maxlength="500" rows="3" placeholder="이 NFT에 대한 설명을 입력하세요."></textarea>
-          </label>
-          <button id="uploadAsset" type="button">이미지만 먼저 업로드</button>
-          <p class="api-note">업로드 API: <code id="uploadApiUrl"></code></p>
-          <label>
-            메타데이터 JSON URI
-            <input id="metadataUri" type="url" value="https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/metadata/doctor-slump-001.json" required />
-          </label>
-          <label class="checkbox-row">
-            <input id="isMutable" type="checkbox" />
-            발행 후 메타데이터 수정 허용
-          </label>
-          <button id="previewMetadata" type="button">메타데이터 미리보기</button>
-          <button id="mintNft" type="submit" class="primary">이미지 업로드 + Phantom NFT 발행</button>
-          <a id="mintExplorer" class="explorer hidden" target="_blank" rel="noreferrer">Explorer에서 새 NFT 확인</a>
-        </form>
-      </div>
+      <a href="./dapp3/" class="hub-card">
+        <div class="hub-icon">⭐</div>
+        <h2>DApp 3 — 로컬 크레딧</h2>
+        <p>지역 활동 크레딧, 잔액 조회, 랭킹 시스템</p>
+        <span class="hub-link">크레딧 확인 →</span>
+      </a>
     </section>
 
     <section class="card">
-      <div class="section-title">
-        <h2>내가 발행한 NFT</h2>
-        <span id="userMintCount" class="count">0</span>
+      <h2>공통 기술 스택</h2>
+      <div class="tech-list">
+        <span class="tech-tag">Solana Devnet</span>
+        <span class="tech-tag">Phantom</span>
+        <span class="tech-tag">@solana/web3.js</span>
+        <span class="tech-tag">Metaplex</span>
+        <span class="tech-tag">SPL Token</span>
+        <span class="tech-tag">Vanilla JS</span>
       </div>
-      <p class="muted">이 브라우저에서 연결된 Phantom 지갑으로 발행한 NFT를 자동으로 기록합니다.</p>
-      <div id="userMintGallery" class="gallery"><p class="muted">민팅 이력을 불러오는 중…</p></div>
-      <button id="clearUserMints" type="button" disabled>이 기기의 민팅 이력 지우기</button>
     </section>
 
-    <section class="card">
-      <h2>최신 자동 민팅 NFT</h2>
-      <div class="row"><span>상태</span><strong id="latestNftStatus">확인 중…</strong></div>
-      <div class="row"><span>이름</span><strong id="latestNftName">-</strong></div>
-      <div class="row"><span>Mint</span><strong id="latestNftMint">-</strong></div>
-      <a id="latestNftExplorer" class="explorer hidden" target="_blank" rel="noreferrer">Explorer에서 NFT 확인</a>
-    </section>
-
-    <section class="card">
-      <div class="section-title">
-        <h2>자동 민팅 갤러리</h2>
-        <span id="galleryCount" class="count">0</span>
-      </div>
-      <div id="nftGallery" class="gallery"><p class="muted">민팅 이력을 불러오는 중…</p></div>
-    </section>
-
-    <div id="status" class="status">페이지 준비 완료</div>
+    <div id="status" class="status">Solana Devnet에 연결하려면 각 DApp에서 Phantom을 연결하세요.</div>
   </main>
-
-  <script src="https://unpkg.com/@solana/web3.js@1.98.4/lib/index.iife.min.js"></script>
-  <script type="module" src="./app.js"></script>
-  <script type="module" src="./one-click-mint.js"></script>
-  <script type="module" src="./user-mints.js"></script>
 </body>
 </html>

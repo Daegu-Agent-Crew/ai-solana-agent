@@ -1,0 +1,21 @@
+{
+  "name": "AI Solana Agent NFT",
+  "symbol": "AISOL",
+  "description": "Genesis Devnet NFT minted and verified by the AI Solana Agent workflow.",
+  "image": "https://daegu-agent-crew.github.io/ai-solana-agent/assets/ai-agent-nft-001.svg",
+  "external_url": "https://daegu-agent-crew.github.io/ai-solana-agent/",
+  "attributes": [
+    { "trait_type": "Network", "value": "Solana Devnet" },
+    { "trait_type": "Agent", "value": "AI Solana Agent" },
+    { "trait_type": "Edition", "value": "Genesis" }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://daegu-agent-crew.github.io/ai-solana-agent/assets/ai-agent-nft-001.svg",
+        "type": "image/svg+xml"
+      }
+    ],
+    "category": "image"
+  }
+}

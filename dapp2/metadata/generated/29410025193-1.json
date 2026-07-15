@@ -1,0 +1,21 @@
+{
+  "name": "AI Agent #4113162183",
+  "symbol": "AISOL",
+  "description": "Created by the AI Solana Agent on Devnet.",
+  "image": "https://daegu-agent-crew.github.io/ai-solana-agent/assets/ai-agent-nft.svg",
+  "attributes": [
+    {
+      "trait_type": "Network",
+      "value": "Devnet"
+    }
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "https://daegu-agent-crew.github.io/ai-solana-agent/assets/ai-agent-nft.svg",
+        "type": "image/svg+xml"
+      }
+    ]
+  }
+}

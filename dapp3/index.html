@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>🏛️ Local Credit — DApp3</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>" />
+</head>
+<body>
+
+  <!-- ===== Header ===== -->
+  <header class="header">
+    <div class="header-left">
+      <span class="header-logo">🏛️</span>
+      <div class="header-title">
+        Local Credit
+        <small>Solana Devnet · 온체인 크레딧 시스템</small>
+      </div>
+    </div>
+    <button id="btn-connect" class="btn btn-primary">🔗 Phantom 연결</button>
+    <div id="wallet-display" class="wallet-info" style="display:none; align-items:center;">
+      <span class="dot"></span>
+      <code id="wallet-address">—</code>
+      <span id="role-badge"></span>
+      <button class="btn btn-ghost btn-sm" id="btn-disconnect">연결해제</button>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <a href="../" class="back-link" style="display:inline-block;margin-bottom:12px;color:#93c5fd;text-decoration:none;font-size:.88rem;">← DApp Trio</a>
+    <div id="alert-main" class="alert"></div>
+
+    <!-- ===== Network Badge ===== -->
+    <div style="margin-bottom:12px;">
+      <span id="network-badge" class="badge badge-network" style="display:none;">⚡ Devnet</span>
+    </div>
+
+    <!-- ===== Stats Row ===== -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-credits">0</div>
+        <div class="stat-label">내 크레딧</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-value" id="stat-activities">0</div>
+        <div class="stat-label">활동 수</div>
+      </div>
+    </div>
+
+    <!-- ===== On-chain Sync ===== -->
+    <div class="card">
+      <div class="card-title">🔗 온체인 데이터 동기화</div>
+      <p class="card-desc">내 지갑의 최근 트랜잭션에서 CREDIT memo를 찾아 크레딧을 동기화합니다.</p>
+      <button class="btn btn-ghost btn-sm" id="btn-fetch">🔄 온체인 동기화</button>
+    </div>
+
+    <!-- ===== Admin Panel ===== -->
+    <div id="admin-panel" style="display:none;">
+
+      <div class="card">
+        <div class="card-title">
+          🎛️ 활동 등록 <span class="badge badge-admin">관리자 전용</span>
+        </div>
+        <p class="card-desc">활동을 선택하고 사용자에게 크레딧을 지급하세요. 지급 내역은 Solana 블록체인에 memo로 기록됩니다.</p>
+
+        <div id="alert-admin" class="alert"></div>
+
+        <!-- Activity Type Grid -->
+        <div class="form-group">
+          <label class="form-label">활동 유형</label>
+          <div id="activity-grid" class="activity-grid"></div>
+        </div>
+
+        <!-- Custom Activity Name -->
+        <div class="form-group" id="custom-name-row" style="display:none;">
+          <label class="form-label">커스텀 활동명</label>
+          <input id="input-activity-name" type="text" class="form-input" placeholder="예: 봉사활동, 설문조사 참여 등" />
+        </div>
+
+        <!-- Custom Points -->
+        <div class="form-row">
+          <div class="form-group" id="custom-points-row" style="display:none;">
+            <label class="form-label">크레딧 점수</label>
+            <input id="input-points" type="number" class="form-input" placeholder="예: 15" min="1" max="9999" />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Recipient -->
+        <div class="form-group">
+          <label class="form-label">수신자 지갑 주소</label>
+          <input id="input-recipient" type="text" class="form-input" placeholder="수신자 Solana 주소 입력" />
+          <div class="copy-hint">📍 크레딧을 받을 사용자의 지갑 주소</div>
+        </div>
+
+        <button id="btn-award" class="btn btn-gold" style="width:100%;">🏆 크레딧 지급</button>
+        <div id="tx-link" style="margin-top:10px;"></div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="card">
+        <div class="card-title">⚠️ 데이터 관리</div>
+        <p class="card-desc">로컬에 저장된 모든 크레딧 기록을 삭제합니다. (온체인 데이터는 유지됩니다)</p>
+        <button id="btn-clear-data" class="btn btn-ghost btn-sm">🗑️ 로컬 데이터 초기화</button>
+      </div>
+    </div>
+
+    <!-- ===== User Panels (Leaderboard + Activity Log) ===== -->
+    <div id="user-panels" style="display:none;">
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active" data-tab="leaderboard">🏆 리더보드</div>
+        <div class="tab" data-tab="myactivity">📋 내 활동</div>
+      </div>
+
+      <!-- Tab: Leaderboard -->
+      <div id="tab-leaderboard">
+        <div class="card">
+          <div class="card-title">🏆 크레딧 리더보드</div>
+          <p class="card-desc">참여자별 누적 크레딧 랭킹</p>
+          <div id="leaderboard"></div>
+        </div>
+      </div>
+
+      <!-- Tab: My Activity -->
+      <div id="tab-myactivity" style="display:none;">
+        <div class="card">
+          <div class="card-title">📋 내 활동 기록</div>
+          <p class="card-desc">크레딧을 획득한 활동 내역</p>
+          <div id="activity-log"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== Footer Info ===== -->
+    <div style="text-align:center; margin-top:24px; font-size:12px; color:var(--text-faint);">
+      <p>📡 RPC: api.devnet.solana.com</p>
+      <p>Memo 프로그램: MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr</p>
+      <p style="margin-top:6px;">DApp3 Local Credit · 프론트엔드 전용 (빌드 불필요)</p>
+    </div>
+
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

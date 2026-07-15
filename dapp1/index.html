@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#070a12" />
+  <title>출석 인증 · Solana</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <a href="../" class="back-link" style="display:inline-block;margin-bottom:12px;color:#93c5fd;text-decoration:none;font-size:.88rem;">← DApp Trio</a>
+      <br>
+      <span class="badge">Solana Devnet · Memo Program</span>
+      <h1>📚 출석 인증</h1>
+      <p>매일 Solana 블록체인에 출석을 기록합니다. Phantom 지갑으로 간편하게 참여하세요.</p>
+    </header>
+
+    <!-- Wallet Card -->
+    <section class="card">
+      <h2>Phantom 지갑</h2>
+      <p id="wallet">연결되지 않음</p>
+      <div class="row"><span>Devnet 잔액</span><strong id="balance">-</strong></div>
+      <div class="row"><span>오늘 출석</span><strong><span id="todayBadge" class="today-badge pending">미출석</span></strong></div>
+      <button id="connect" class="primary">Phantom 연결</button>
+      <button id="disconnect" class="hidden">지갑 연결 해제</button>
+      <button id="airdrop" disabled>Devnet 2 SOL 받기</button>
+    </section>
+
+    <!-- Attendance Action -->
+    <section class="card">
+      <div class="section-title">
+        <h2>출석 체크</h2>
+        <span class="count" id="totalDays">0일</span>
+      </div>
+      <p>오늘 <strong id="todayDate">-</strong>의 출석을 기록합니다.</p>
+      <p class="muted">메모 트랜잭션: <code id="memoPreview">ATTEND:----</code></p>
+      <button id="attend" class="primary" disabled>출석하기</button>
+    </section>
+
+    <!-- Stats -->
+    <section class="card">
+      <div class="section-title">
+        <h2>내 통계</h2>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-tile">
+          <div class="stat-value" id="myCount">0</div>
+          <div class="stat-label">누적 출석</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-value" id="globalRank">-</div>
+          <div class="stat-label">전체 순위</div>
+        </div>
+      </div>
+      <div class="row"><span>최근 출석 시간</span><strong id="lastAttend">-</strong></div>
+      <a id="explorerLink" class="explorer hidden" href="#" target="_blank" rel="noopener">Solana Explorer에서 확인 ↗</a>
+    </section>
+
+    <!-- Leaderboard -->
+    <section class="card">
+      <div class="section-title">
+        <h2>참여자 현황</h2>
+        <span class="count" id="totalParticipants">0명</span>
+      </div>
+      <div id="leaderboard" class="attend-list">
+        <div class="empty-state">아직 참여자가 없습니다.</div>
+      </div>
+    </section>
+
+    <div id="status" class="status hidden"></div>
+  </main>
+
+  <script src="https://unpkg.com/@solana/web3.js@1.98.4/lib/index.iife.min.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
