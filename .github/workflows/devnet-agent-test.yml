@@ -12,7 +12,7 @@ on:
       transact:
         description: 'Run the signed zero-SOL self-transaction test'
         required: true
-        default: false
+        default: true
         type: boolean
 
 permissions:
@@ -23,20 +23,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  safety-check:
+  devnet-agent:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 7
     env:
       SOLANA_RPC_URL: https://api.devnet.solana.com
       DEVNET_AGENT_KEYPAIR: ${{ secrets.DEVNET_AGENT_KEYPAIR }}
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install --no-audit --no-fund
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
       - name: Devnet network and wallet check
         run: npm run agent:check
+
       - name: Signed zero-SOL self-transaction
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.transact }}
+        if: ${{ github.event_name == 'push' || inputs.transact }}
         run: npm run agent:test
+
+      - name: Publish report to workflow summary
+        if: always()
+        run: |
+          if [ -f reports/devnet-agent-report.md ]; then
+            cat reports/devnet-agent-report.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo '# Devnet Agent Test Report' >> "$GITHUB_STEP_SUMMARY"
+            echo '' >> "$GITHUB_STEP_SUMMARY"
+            echo 'No report file was produced.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload Devnet agent reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: devnet-agent-report-${{ github.run_number }}
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 14
