@@ -60,12 +60,17 @@ const identity = createSignerFromKeypair(umi, keypair);
 umi.use(signerIdentity(identity));
 
 const mint = generateSigner(umi);
-const name = `AI Solana Agent NFT ${Date.now()}`;
+const name = `AI Agent #${Date.now().toString().slice(-10)}`;
+
+if (Buffer.byteLength(name, 'utf8') > 32) {
+  throw new Error(`NFT name exceeds Metaplex 32-byte limit: ${name}`);
+}
 
 console.log(`RPC: ${RPC}`);
 console.log(`Agent wallet: ${identity.publicKey}`);
 console.log(`Balance: ${(balance / LAMPORTS_PER_SOL).toFixed(6)} SOL`);
 console.log(`Metadata URI: ${METADATA_URI}`);
+console.log(`NFT name: ${name}`);
 console.log(`Mint candidate: ${mint.publicKey}`);
 
 const result = await createNft(umi, {
