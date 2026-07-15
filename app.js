@@ -31,6 +31,7 @@ const galleryCountEl = document.getElementById('galleryCount');
 let provider = null;
 let publicKey = null;
 let cachedMetadata = null;
+let minting = false;
 
 function setStatus(message, kind = '') {
   statusEl.textContent = message;
@@ -58,6 +59,12 @@ function formatDate(value) {
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   }).format(new Date(value));
+}
+
+function updateMintButton() {
+  if (minting) return;
+  mintBtn.disabled = false;
+  mintBtn.textContent = publicKey ? 'Phantom으로 NFT 발행' : 'Phantom 연결 후 NFT 발행';
 }
 
 function validateMintInput() {
@@ -108,18 +115,23 @@ async function refreshBalance() {
 }
 
 async function connectWallet() {
+  provider = getProvider();
+  if (!provider) throw new Error('Phantom 앱 또는 Phantom 확장 프로그램이 필요합니다.');
+  setStatus('Phantom 연결 승인 대기 중…', 'working');
+  const result = await provider.connect();
+  publicKey = result.publicKey;
+  walletEl.textContent = publicKey.toString();
+  connectBtn.textContent = '연결됨';
+  refreshBtn.disabled = false;
+  updateMintButton();
+  await refreshBalance();
+  setStatus('Phantom 연결 완료', 'success');
+  return publicKey;
+}
+
+async function handleConnectClick() {
   try {
-    provider = getProvider();
-    if (!provider) throw new Error('Phantom 앱 또는 Phantom 확장 프로그램이 필요합니다.');
-    setStatus('Phantom 연결 승인 대기 중…', 'working');
-    const result = await provider.connect();
-    publicKey = result.publicKey;
-    walletEl.textContent = publicKey.toString();
-    connectBtn.textContent = '연결됨';
-    refreshBtn.disabled = false;
-    mintBtn.disabled = false;
-    await refreshBalance();
-    setStatus('Phantom 연결 완료', 'success');
+    await connectWallet();
   } catch (error) {
     setStatus(`연결 실패: ${error.message || error}`, 'error');
   }
@@ -128,9 +140,12 @@ async function connectWallet() {
 async function mintWithConnectedWallet(event) {
   event.preventDefault();
   try {
-    if (!provider || !publicKey) throw new Error('먼저 Phantom 지갑을 연결하세요.');
     const input = validateMintInput();
+    if (!provider || !publicKey) await connectWallet();
+
+    minting = true;
     mintBtn.disabled = true;
+    mintBtn.textContent = 'NFT 발행 진행 중…';
     mintExplorerEl.classList.add('hidden');
 
     setStatus('메타데이터 검증 중…', 'working');
@@ -162,7 +177,8 @@ async function mintWithConnectedWallet(event) {
     console.error(error);
     setStatus(`NFT 발행 실패: ${error.message || error}`, 'error');
   } finally {
-    mintBtn.disabled = !publicKey;
+    minting = false;
+    updateMintButton();
   }
 }
 
@@ -211,13 +227,14 @@ async function loadNftHistory() {
   }
 }
 
-connectBtn.addEventListener('click', connectWallet);
+connectBtn.addEventListener('click', handleConnectClick);
 refreshBtn.addEventListener('click', refreshBalance);
 previewMetadataBtn.addEventListener('click', previewMetadata);
 mintForm.addEventListener('submit', mintWithConnectedWallet);
 metadataUriEl.addEventListener('change', () => { cachedMetadata = null; });
 
 window.addEventListener('load', async () => {
+  updateMintButton();
   await Promise.all([loadLatestNft(), loadNftHistory(), previewMetadata()]);
   provider = getProvider();
   if (!provider) return;
@@ -227,9 +244,9 @@ window.addEventListener('load', async () => {
     walletEl.textContent = publicKey.toString();
     connectBtn.textContent = '연결됨';
     refreshBtn.disabled = false;
-    mintBtn.disabled = false;
+    updateMintButton();
     await refreshBalance();
   } catch (_) {
-    // 아직 연결 승인 전인 정상 상태.
+    updateMintButton();
   }
 });
