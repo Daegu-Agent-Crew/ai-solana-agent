@@ -1,0 +1,12 @@
+{
+  "name": "coupon-loop-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/index.js",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.111.0"
+  }
+}

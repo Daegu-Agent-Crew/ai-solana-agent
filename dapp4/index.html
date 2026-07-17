@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#07120f" />
+  <title>Coupon Loop — DApp 4</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./mobile.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../"><span class="brand-mark">C</span><span>Coupon Loop<small>DApp 4 · Solana Devnet</small></span></a>
+    <button id="connectWallet" class="button primary">Phantom 연결</button>
+    <div id="walletChip" class="wallet-chip hidden"><span class="live-dot"></span><span id="walletAddress">-</span></div>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <span class="eyebrow">METAPLEX CORE · CLOUDFLARE EDGE</span>
+        <h1>쿠폰은 쓰고,<br /><em>컬렉션은 남기세요.</em></h1>
+        <p>매장에서 받은 NFT 쿠폰을 3분 QR로 사용하고, 사용 기록은 Solana와 Cloudflare에 함께 남깁니다.</p>
+        <div class="hero-actions">
+          <button class="button primary" data-tab-target="wallet">내 쿠폰 보기</button>
+          <button class="button secondary" data-tab-target="store">매장 시작하기</button>
+        </div>
+      </div>
+      <div class="hero-ticket">
+        <div class="ticket-top"><span>DAEGU LOOP</span><span>DEVNET</span></div>
+        <div class="ticket-art">10<span>%</span></div>
+        <strong>WELCOME COUPON</strong>
+        <p>Metaplex Core NFT · Permanent Freeze</p>
+        <div class="ticket-code">COUPON · 2026 · LOOP</div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="서비스 상태">
+      <article><span>내 활성 쿠폰</span><strong id="activeCount">0</strong></article>
+      <article><span>사용 완료</span><strong id="usedCount">0</strong></article>
+      <article><span>내 스캔 순위</span><strong id="myRank">-</strong></article>
+      <article><span>Edge API</span><strong id="apiState" class="status-dot">확인 중</strong></article>
+    </section>
+
+    <nav class="tabs" aria-label="DApp 기능">
+      <button class="tab active" data-tab="wallet">내 쿠폰</button>
+      <button class="tab" data-tab="redeem">QR 사용</button>
+      <button class="tab" data-tab="store">매장 관리</button>
+      <button class="tab" data-tab="ranking">랭킹</button>
+    </nav>
+
+    <section id="panel-wallet" class="panel active">
+      <div class="section-heading"><div><span class="eyebrow">MY COLLECTION</span><h2>내 쿠폰 지갑</h2></div><button id="refreshCoupons" class="button ghost">새로고침</button></div>
+      <div id="couponGrid" class="coupon-grid"><div class="empty">Phantom을 연결하면 D1에 등록된 내 쿠폰을 불러옵니다.</div></div>
+    </section>
+
+    <section id="panel-redeem" class="panel">
+      <div class="split">
+        <div>
+          <span class="eyebrow">180 SECOND CHECKOUT</span>
+          <h2>쿠폰 사용</h2>
+          <p class="muted">매장의 QR을 스캔하면 쿠폰과 OTP가 자동 입력됩니다. 사용자는 Solana Memo 수수료를 직접 지불합니다.</p>
+          <label>쿠폰 Asset 주소<input id="redeemAsset" placeholder="Metaplex Core Asset 주소" /></label>
+          <label>6자리 OTP<input id="redeemOtp" maxlength="6" placeholder="예: A7K2MP" autocapitalize="characters" /></label>
+          <button id="redeemCoupon" class="button primary wide">Phantom 서명으로 사용하기</button>
+          <div id="redeemResult" class="result hidden"></div>
+        </div>
+        <div class="flow-card">
+          <h3>사용 처리 흐름</h3>
+          <ol><li><b>1</b><span>매장 QR / OTP 확인</span></li><li><b>2</b><span>Solana Memo 서명</span></li><li><b>3</b><span>D1 중복 사용 차단</span></li><li><b>4</b><span>NFT 동결 후 컬렉션 보존</span></li></ol>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-store" class="panel">
+      <div class="section-heading"><div><span class="eyebrow">STORE CONSOLE</span><h2>매장 관리</h2></div><span id="storeBadge" class="pill">미등록</span></div>
+      <div class="store-grid">
+        <form id="storeForm" class="form-card">
+          <h3>1. 매장 등록</h3><p>현재 지갑을 매장 권한으로 등록합니다.</p>
+          <label>매장 이름<input id="storeName" maxlength="80" value="Daegu Loop Store" /></label>
+          <button class="button secondary wide" type="submit">지갑 서명으로 등록</button>
+        </form>
+        <form id="mintForm" class="form-card">
+          <h3>2. Core 쿠폰 발행</h3><p>고객 지갑으로 Core NFT를 직접 발행합니다.</p>
+          <label>쿠폰 이름<input id="couponName" maxlength="100" value="Daegu Welcome 10%" /></label>
+          <label>혜택<input id="couponBenefit" maxlength="120" value="음료 10% 할인" /></label>
+          <label>고객 지갑<input id="couponOwner" placeholder="쿠폰을 받을 Solana 주소" /></label>
+          <label>메타데이터 URI<input id="metadataUri" type="url" value="https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/main/metadata/doctor-slump-001.json" /></label>
+          <label>유효기간<input id="expiryDays" type="number" min="1" max="365" value="30" /></label>
+          <button class="button primary wide" type="submit">Metaplex Core 쿠폰 발행</button>
+        </form>
+        <div class="form-card">
+          <h3>3. QR / OTP 생성</h3><p>내가 발행한 활성 쿠폰을 선택하세요.</p>
+          <label>쿠폰<select id="storeCouponSelect"><option value="">쿠폰을 선택하세요</option></select></label>
+          <button id="createOtp" class="button secondary wide">3분 QR 생성</button>
+          <div id="qrBox" class="qr-box hidden"><img id="qrImage" alt="쿠폰 사용 QR" /><strong id="otpCode">------</strong><span>3분 후 자동 만료</span></div>
+        </div>
+      </div>
+      <div class="section-heading compact"><div><h3>발행·사용 현황</h3><p class="muted">사용 완료 쿠폰은 매장 지갑으로 온체인 동결을 확정할 수 있습니다.</p></div><button id="refreshStore" class="button ghost">현황 갱신</button></div>
+      <div id="storeCouponList" class="table-wrap"><div class="empty">매장 등록 후 쿠폰 현황을 확인할 수 있습니다.</div></div>
+    </section>
+
+    <section id="panel-ranking" class="panel">
+      <div class="section-heading"><div><span class="eyebrow">LOCAL ACTIVITY</span><h2>쿠폰 사용 랭킹</h2></div><button id="refreshRanking" class="button ghost">새로고침</button></div>
+      <div id="rankingList" class="ranking-list"><div class="empty">랭킹을 불러오는 중입니다.</div></div>
+    </section>
+
+    <footer><span>Solana Devnet</span><span>Metaplex Core</span><span>Cloudflare Workers · D1 · KV</span><span>GitHub Pages</span></footer>
+  </main>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
