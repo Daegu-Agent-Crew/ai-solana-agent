@@ -1,0 +1,6 @@
+{
+  "name": "CLE2 Devnet Meme Coin",
+  "symbol": "DMEME",
+  "description": "Educational Phase 0 rehearsal coin minted on Solana devnet for CLE2-25. No value, devnet only, mint/freeze authorities revoked, LP burned.",
+  "image": "https://raw.githubusercontent.com/Daegu-Agent-Crew/ai-solana-agent/cle2-25-phase0/assets/ai-agent-nft.svg"
+}

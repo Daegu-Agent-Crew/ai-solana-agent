@@ -4,3 +4,7 @@ worker/node_modules/
 worker/.wrangler/
 .env
 .dev.vars
+
+# CLE2-25 Phase 0 local run artifacts (never commit secrets/state)
+dapp4-pipeline/.devnet-wallet.json
+dapp4-pipeline/state.json
