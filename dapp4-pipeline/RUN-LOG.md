@@ -38,6 +38,7 @@
 **Devnet SOL 부족 — 퍼블릭 파우셋 고갈/레이트리밋.**
 
 - 재시도 타임라인 (23:11 최초 요청 2 SOL `Internal error` → 23:12 429 → 23:20 429 → 23:30 429, 총 4회 요청/3회 간격 재시도 후 중단)
+- **8/30 09:15 자동 재시도 (cron)**: 09:16 요청 1 SOL → `Internal error` → 90초 대기 후 09:18 재요청 → **429** (동일 문구, 일일 한도/파우셋 고갈). 총 2회 요청 후 즉시 중단. 어젯밤 첫 요청(23:11) 기준 24h 롤링 윈도우로 추정 → **다음 자동 재시도 유효 시점: 8/30 23:30 이후** (수동 펀딩은 언제든 가능)
 - 응답: `429: You've either reached your airdrop limit today or the airdrop faucet has run dry. Please visit https://faucet.solana.com` → 일일 한 도달 또는 파우셋 고갈 (일시적 버스트가 아님)
 - 대체 무료 RPC 검토: drpc(유료 플랜 필요), ankr(API 키 필요), publicnode(엔드포인트 없음), helius(API 키 필요) → 전부 불가
 - 리포 내 기존 devnet 지갑 잔액 조사: 로컬 키페어 없음(기존 지갑은 GitHub Actions 시크릿에만 존재)
