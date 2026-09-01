@@ -67,3 +67,11 @@
 - devnet 외 RPC 실행 차단 검증 포함(`assertDevnet`) · mainnet 트랜잭션 0건
 - 시크릿 키 파일 `.gitignore` 등록(`dapp4-pipeline/.devnet-wallet.json`, `state.json`) · 커밋 대상에서 제외 확인
 - 커밋 브랜치: `cle2-25-phase0` 만. main 푸시/PR 없음
+
+## 2026-09-01 · Phase 4 관측 대시보드 통합 설계 (teamwork 경쟁 탐색)
+
+- 과정: teamwork 스킬 — Explorer 3개 전략(MVP / 데이터 깊이 / 교육·투명성) 병렬 설계 → Falsifier 3개 독립 반증 → 통합·게이트 심사(세 안 모두 조건부 생존, 폐기 0건)
+- 산출: `DESIGN-market-dashboard.md` (dapp4/market 배치, D1 시계열 축, 컴플라이언스 UI 강제, 반증 반영 측정 수정)
+- 주요 정정(반증 결과): ① 집중도 지표는 풀 볼트·번 주소 포함 시 오보 → 필터+명칭 변경 ② 롤링 h24 차분 부호 왜곡 → 증분 정의 ③ Worker egress→공개 RPC 429 실측 → 브라우저 계산 우선 ④ devnet 리허설 무의미 → 섀도우 토큰 방식 채택
+- 선행 실측 게이트(0단계) 통과 전 구현 착수 금지로 명문화
+- 커밋 브랜치: `cle2-25-phase0` 만. main 푸시/PR 없음
