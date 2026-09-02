@@ -75,3 +75,19 @@
 - 주요 정정(반증 결과): ① 집중도 지표는 풀 볼트·번 주소 포함 시 오보 → 필터+명칭 변경 ② 롤링 h24 차분 부호 왜곡 → 증분 정의 ③ Worker egress→공개 RPC 429 실측 → 브라우저 계산 우선 ④ devnet 리허설 무의미 → 섀도우 토큰 방식 채택
 - 선행 실측 게이트(0단계) 통과 전 구현 착수 금지로 명문화
 - 커밋 브랜치: `cle2-25-phase0` 만. main 푸시/PR 없음
+
+## 2026-09-02 · 0단계 선행 실측 게이트 4건 완료 (teamwork 패턴 B: 분해+병렬)
+
+- 과정: Solver 2명 병렬(게이트 ③페어 선택 · 게이트 ④집중도 필터) + Lead 직접 실측(게이트 ①CPU · 게이트 ②egress RPC, 임시 Worker `dapp4-gate-bench` 배포→실측→삭제) → Verifier 독립 검수(전 게이트 Accepted, 0단계 승인)
+- 결과: `dapp4-pipeline/gates/gate{1-2,3,4}*.md` + 벤치마크 코드 `dapp4-pipeline/gate-bench/`
+
+| 게이트 | 판정 | 핵심 결과 |
+|---|---|---|
+| ① Worker 크론 CPU 10ms | **PASS** | 400행(일 최대치) 지표 8종 집계 cpuMs≈0, 크론 Ok 2회, 한도 초과 0건 |
+| ② Worker egress→공개 RPC | **확인 완료(차단 확정)** | `getSlot` 403 "Your IP or provider is blocked" 3회(본문 기록) → 핵심 결정 8(브라우저 우선) 유지 |
+| ③ 페어 선택 규칙 | **PASS** | BONK 30페어·BABYSOL·SPSC·RAYCAT, 12분 재조회 top1 불변. 응답 비정렬 확인 → 클라이언트 정렬 계약 필요 |
+| ④ 집중도 필터 | **CONDITIONAL** | 필터 전 CR20 56.32% → 필터 후 31.34%(**1.8배 과대 오보 실증**). v1 태그 방식 위양성(온체인 태그 부재) → v2 3단 계층(레지스트리→풀 파싱→owner-program) 채택. 대형 민트는 이 호스트 경로 봉쇄(getTokenLargestAccounts·getProgramAccounts 429 27/27) → 경로 분기 필요 |
+
+- Verifier 경미 지점(판정 불변): 게이트 ④ 원시데이터 일부 미보존(/usr/tmp 소실 — 방법 기록으로 재현 가능), 게이트 ① cpuMs 측정 출처(코드 toFixed(3))·게이트 ③ 격차 공식 정의 미기재 → 보고서에 명시했음
+- 잔여 조치: ① 설계 반영 3건(필터 v2 채택 · 소형/대형 민트 경로 분기 · 게이트 ③ 권고 계약화) — 본 커밋에 반영 ② CF 토큰 폐기 권장(회장님 조치) ③ 대형 민트 집중도 경로(브라우저 실증 또는 유료 RPC)는 A단계 분기로 처리
+- 커밋 브랜치: `cle2-25-phase0` 만. main 푸시/PR 없음
