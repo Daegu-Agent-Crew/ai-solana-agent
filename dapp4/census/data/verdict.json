@@ -1,0 +1,80 @@
+{
+ "generated_at": "2026-09-26T01:34:40+00:00",
+ "version": "verdict-v2 (CLE2-29 Phase 1) — 4스위치 + 프레임 조항",
+ "input": {
+  "source": "dapp4/census/data/baseline/aggregate.json",
+  "n": 95,
+  "era1_n": 52,
+  "era1_double_rate": 0.38461538461538464,
+  "era1_famous_rate": 1.0,
+  "era1_tail_rate": 0.3191489361702128,
+  "era2_n": 43,
+  "era2_custom_n": 35,
+  "era2_custom_double_rate": 0.9428571428571428,
+  "era2_pump_n": 8,
+  "era2_pump_double_rate": 1.0,
+  "s1_template_share": 0.13114754098360656,
+  "s4_claims_found": 0,
+  "meta_collected_at": "2026-09-26"
+ },
+ "prior": "B 55 : A 45",
+ "switches": {
+  "S1_floor_75pct_to_A": {
+   "condition": "전체 폐기 중 템플릿(강제/주변) 폐기 비중 ≥ 0.75 → A",
+   "value_coin_weighted": 0.1311,
+   "value_population_weighted": 1.0,
+   "population_note": "센서스 신규 발행 모집단 프록시(latest.json, n=8) — 무작위 프레임은 아님(검출 편향 고지).",
+   "threshold": 0.75,
+   "fired": false,
+   "frame": "coin-weighted (등록/가시성 프레임) — 공식 판정 축 / population-weighted 병기 고지"
+  },
+  "S2_voluntary_band_absence_to_A": {
+   "condition": "era-1 자발 층 밴드 부재(유명 상단 꼬리 − 중앙값 테일 기울기 ≥ 0.40 및 유효 n ≥ 10이면 밴드 존재) → 부재 시 A",
+   "era1_famous_rate": 1.0,
+   "era1_tail_rate": 0.3191,
+   "gradient": 0.6809,
+   "era1_n": 52,
+   "band_present": true,
+   "fired": false,
+   "frame": "coin-weighted (등재 코인 프레임 — era-1은 token-list 등재 모집단). 모집단 프레임에서는 유명 층 비중 ≈ 0 → 밴드 붕괴 전망(고지 조항)"
+  },
+  "S3_mixed_lt30_to_A": {
+   "condition": "era-2 커스텀 런치 폐기 비중 < 0.30 → A",
+   "value": 0.9429,
+   "n": 35,
+   "threshold": 0.3,
+   "fired": false,
+   "frame": "coin-weighted (검색-가시 커스텀 프레임 — 검출 편향 고지)"
+  },
+  "S4_false_claim_gt50_to_B": {
+   "condition": "폐기 주장 중 체인 불일치 > 0.50 → B",
+   "claims_found": 0,
+   "value": null,
+   "threshold": 0.5,
+   "fired": false,
+   "status": "UNSCORABLE — 담론 패널(오프체인 주장 수집) 필요. 상태층 온체인 텍스트 주장 0건(프로브 슬롯3).",
+   "frame": "discourse panel (Phase 2 입력 대기)"
+  }
+ },
+ "verdict": {
+  "prior": "B 55 : A 45",
+  "flips_A": [],
+  "flips_B": [],
+  "final": "PRIOR-HOLD B 55 : A 45 (스위치 0발동 → 사전 유지)",
+  "winner": "B(prior)"
+ },
+ "frame_clauses": {
+  "s1_dual_frame": "S1은 코인-가중(공식 판정 축)과 모집단-가중(병기 고지)을 모두 계산한다.",
+  "s2_population_note": "S2 밴드는 등재 코인 프레임 위의 존재 판정 — 모집단 프레임에서 유명 층 비중 ≈ 0이면 밴드 붕괴(등록 설계 한계 고지).",
+  "pump_tail_random_frame": "PENDING — Phase 2 센서스 관측으로 era-2 무작위 pump 테일 프레임 구축 후 S1/S3 모집단-가중 값 확정.",
+  "official_frame": "공식 판정은 등록(코인-가중) 프레임 위에서 — deep_r1c05 계승"
+ },
+ "compliance": "교육·관측 목적 · 투자 권유 아님 · read-only · KRW 표기 금지",
+ "reproduction_check": {
+  "expected": "PRIOR-HOLD B 55 : A 45 · S1 13.1% (memecoin-probe 2026-09-26)",
+  "prior_hold_reproduced": true,
+  "s1_value": 0.1311,
+  "s1_reproduced": true,
+  "pass": true
+ }
+}

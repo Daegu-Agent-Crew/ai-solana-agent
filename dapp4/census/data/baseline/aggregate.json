@@ -1,0 +1,398 @@
+{
+ "n": 95,
+ "buckets": {
+  "E1": 21,
+  "E2": 31,
+  "E4": 19,
+  "E3": 24
+ },
+ "strata": {
+  "voluntary-era1": 19,
+  "era1-kept": 33,
+  "custom-kept": 2,
+  "mixed-custom": 33,
+  "template": 8
+ },
+ "fame_split": {
+  "era1_famous": 5,
+  "era1_tail": 47,
+  "era2_famous": 15,
+  "era2_tail": 28
+ },
+ "era_contrast": {
+  "era1_n": 52,
+  "era1_double_rate": 0.38461538461538464,
+  "era1_famous_rate": 1.0,
+  "era1_tail_rate": 0.3191489361702128,
+  "era2_n": 43,
+  "era2_double_rate": 0.9534883720930233,
+  "era2_custom_n": 35,
+  "era2_custom_double_rate": 0.9428571428571428,
+  "era2_pump_n": 8,
+  "era2_pump_double_rate": 1.0,
+  "template_share_of_renunciations": 0.13114754098360656
+ },
+ "update_authority": {
+  "kept_overall": 0.5263157894736842,
+  "era1_renounced_kept_update": 0.55,
+  "era2_custom_renounced_kept_update": 0.9090909090909091
+ },
+ "switches": {
+  "S1_floor_75pct_to_A": {
+   "value": 0.13114754098360656,
+   "fired": false
+  },
+  "S2_voluntary_band_absence_to_A": {
+   "top_tail_rate": 1.0,
+   "median_tail_rate": 0.3191489361702128,
+   "band_present": true,
+   "fired": false
+  },
+  "S3_mixed_lt30_to_A": {
+   "value": 0.9428571428571428,
+   "fired": false
+  },
+  "S4_false_claim_gt50_to_B": {
+   "claims_found": 0,
+   "fired": false,
+   "note": "unscorable on-chain"
+  }
+ },
+ "verdict": {
+  "prior": "B 55 : A 45",
+  "flips_A": 0,
+  "flips_B": 0,
+  "final": "PRIOR-HOLD B55:A45 (tie->A only among fired switches; none fired)"
+ },
+ "p_packet": {
+  "P3": "UNSCORABLE frame-mismatch (era-2 median pump stratum unmeasured — visibility bias); raw contrast: era1 38.5% vs era2-custom 94.3%",
+  "P4_top_holder_concentration": {
+   "era1_renounced_top10_median": 66.52932665453838,
+   "era1_kept_top10_median": 99.99999999999999,
+   "era2_pump_top10_median": 75.39288815156574,
+   "era2_custom_top10_median": 58.51267163099357
+  },
+  "P5_era_overlap": {
+   "infra_filtered_wallets": 3,
+   "era1xera1_ge2": 5,
+   "era1xera1_total_pairs": 1326,
+   "era1xera1_examples": [
+    [
+     "WIF",
+     "POPCAT",
+     3
+    ],
+    [
+     "WIF",
+     "BONK",
+     4
+    ],
+    [
+     "WIF",
+     "PONKE",
+     2
+    ],
+    [
+     "POPCAT",
+     "BONK",
+     2
+    ],
+    [
+     "POPCAT",
+     "PONKE",
+     2
+    ]
+   ],
+   "era1xera2_ge2": 16,
+   "era1xera2_examples": [
+    [
+     "SAMO",
+     "BOME",
+     2
+    ],
+    [
+     "WIF",
+     "BOME",
+     3
+    ],
+    [
+     "WIF",
+     "GIGA",
+     2
+    ],
+    [
+     "WIF",
+     "MOODENG",
+     3
+    ],
+    [
+     "WIF",
+     "TRUMP",
+     5
+    ],
+    [
+     "WIF",
+     "PENGU",
+     3
+    ],
+    [
+     "POPCAT",
+     "FWOG",
+     2
+    ],
+    [
+     "POPCAT",
+     "GIGA",
+     2
+    ],
+    [
+     "POPCAT",
+     "MOODENG",
+     3
+    ],
+    [
+     "POPCAT",
+     "TRUMP",
+     2
+    ]
+   ],
+   "reading": "지갑 공유는 유명층에만 존재(길드 지속성 P5 부분 지지, 테일 무구조)"
+  },
+  "P6_gradient": {
+   "era1_famous_rate": 1.0,
+   "era1_median_rate": 0.3191489361702128,
+   "predicted": "positive top-tail, flat/negative median"
+  }
+ },
+ "slots": {
+  "slot1_band_shape": {
+   "method": "ren_rate by liquidity decile",
+   "band_all": [
+    {
+     "decile": 1,
+     "n": 9,
+     "liq_range": [
+      0,
+      0
+     ],
+     "ren_rate": 0.1111111111111111
+    },
+    {
+     "decile": 2,
+     "n": 10,
+     "liq_range": [
+      0,
+      0
+     ],
+     "ren_rate": 0.1
+    },
+    {
+     "decile": 3,
+     "n": 9,
+     "liq_range": [
+      0,
+      0
+     ],
+     "ren_rate": 0.3333333333333333
+    },
+    {
+     "decile": 4,
+     "n": 10,
+     "liq_range": [
+      0,
+      12.66053856730985
+     ],
+     "ren_rate": 0.5
+    },
+    {
+     "decile": 5,
+     "n": 9,
+     "liq_range": [
+      36.501208837736925,
+      11291.26
+     ],
+     "ren_rate": 0.5555555555555556
+    },
+    {
+     "decile": 6,
+     "n": 10,
+     "liq_range": [
+      13398.086508446928,
+      89322.7339558573
+     ],
+     "ren_rate": 1.0
+    },
+    {
+     "decile": 7,
+     "n": 9,
+     "liq_range": [
+      103696.99,
+      177148.31
+     ],
+     "ren_rate": 1.0
+    },
+    {
+     "decile": 8,
+     "n": 10,
+     "liq_range": [
+      183972.51736574175,
+      1556919.53
+     ],
+     "ren_rate": 0.9
+    },
+    {
+     "decile": 9,
+     "n": 9,
+     "liq_range": [
+      1693427.764513254,
+      3900571.76
+     ],
+     "ren_rate": 0.8888888888888888
+    },
+    {
+     "decile": 10,
+     "n": 10,
+     "liq_range": [
+      5383977.124708213,
+      138942086.15
+     ],
+     "ren_rate": 1.0
+    }
+   ],
+   "band_era1": [
+    {
+     "decile": 1,
+     "n": 5,
+     "liq_range": [
+      0,
+      0
+     ],
+     "ren_rate": 0.2
+    },
+    {
+     "decile": 2,
+     "n": 5,
+     "liq_range": [
+      0,
+      0
+     ],
+     "ren_rate": 0.0
+    },
+    {
+     "decile": 3,
+     "n": 5,
+     "liq_range": [
+      0,
+      0
+     ],
+     "ren_rate": 0.0
+    },
+    {
+     "decile": 4,
+     "n": 5,
+     "liq_range": [
+      0,
+      0
+     ],
+     "ren_rate": 0.2
+    },
+    {
+     "decile": 5,
+     "n": 6,
+     "liq_range": [
+      0,
+      0
+     ],
+     "ren_rate": 0.3333333333333333
+    },
+    {
+     "decile": 6,
+     "n": 5,
+     "liq_range": [
+      0,
+      0
+     ],
+     "ren_rate": 0.4
+    },
+    {
+     "decile": 7,
+     "n": 5,
+     "liq_range": [
+      0.0012591136359477954,
+      2.3970393698919423
+     ],
+     "ren_rate": 0.6
+    },
+    {
+     "decile": 8,
+     "n": 5,
+     "liq_range": [
+      3.842388039012917,
+      174.1536292984772
+     ],
+     "ren_rate": 0.2
+    },
+    {
+     "decile": 9,
+     "n": 5,
+     "liq_range": [
+      2501.482064028958,
+      84176.12
+     ],
+     "ren_rate": 0.8
+    },
+    {
+     "decile": 10,
+     "n": 6,
+     "liq_range": [
+      103696.99,
+      14532192.031216731
+     ],
+     "ren_rate": 1.0
+    }
+   ],
+   "reading": "bottom deciles (template world) renounce-most; era-1 famous top-tail 100% vs era-1 median tail lower"
+  },
+  "slot2_disposal_ordering": {
+   "panel_n": 8,
+   "renounced_panel": [
+    "SUS",
+    "FFSH",
+    "CLICK",
+    "KIKS"
+   ],
+   "finding": "ALL renounced panel coins disposed mint authority ON LAUNCH DAY (single setAuthority mintTokens->null); freeze absent-at-birth (InitializeMint freeze=None); no later authority events",
+   "state_vector_cross_section": {
+    "110": 46,
+    "100": 1,
+    "111": 15,
+    "010": 3,
+    "011": 26,
+    "001": 3,
+    "101": 1
+   },
+   "rearm_events_found": 0
+  },
+  "slot3_false_claims": {
+   "claims_in_onchain_text": 0,
+   "verdict": "UNSCORABLE from retro state layer — claims live off-chain (discourse panel needed); slot remains reserved"
+  },
+  "slot4_rearmament": {
+   "panel_n": 8,
+   "rearm_events": 0,
+   "lower_bound": "0/8 panel coins, 0 events in sampled history — re-arm lower bound 0% (era-1 tail stratum)"
+  }
+ },
+ "meta": {
+  "collected_at": "2026-09-26",
+  "read_only": true,
+  "rpc_calls_total": -351,
+  "sources": {
+   "rpc": "api.mainnet-beta.solana.com",
+   "dex": "api.dexscreener.com",
+   "rugcheck": "api.rugcheck.xyz/v1",
+   "frame": "solana-labs/token-list(2022 frozen), pump.fun frontend-api v3(2024 early), CoinGecko meme category"
+  }
+ },
+ "excluded_records": 22
+}
