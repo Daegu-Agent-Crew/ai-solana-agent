@@ -1,0 +1,147 @@
+{
+ "addr": "Fi7ALB9GafgeGdq99oNJgz1s7GkWozra5v3jXpbdpump",
+ "expected_symbol": "$MOSA",
+ "source": "geckoterminal-new_pools",
+ "detected": {
+  "detected_pool": "7do5JUbmzFcN6mQY1q1zRTAeX63WBd6oasjhdW6KdYbp",
+  "detected_at_pool_created": "2026-09-26T19:26:44Z",
+  "detected_name": "$MOSA / SOL",
+  "detected_symbol": "$MOSA"
+ },
+ "pair": {
+  "pair_id": "7do5JUbmzFcN6mQY1q1zRTAeX63WBd6oasjhdW6KdYbp",
+  "dex_id": "pumpfun",
+  "pair_created_at_ms": 1790450804000,
+  "liquidity_usd": null,
+  "price_usd": "0.000003932",
+  "fdv_usd": 3932.85,
+  "pair_url": "https://dexscreener.com/solana/7do5jubmzfcn6mqy1q1zrtaex63wbd6oasjhdw6kdybp",
+  "token_symbol": "$MOSA",
+  "token_name": "Mintmosaic",
+  "n_pairs_seen": 1,
+  "info_socials": false
+ },
+ "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+ "decimals": 6,
+ "supply_raw": "1000000000000000",
+ "mint_authority": null,
+ "freeze_authority": null,
+ "metadata_pda": "7c8NxHx2AFE6FuFxBDhrwUAQ8mSoSSGMf6vkGVFFT7Td",
+ "meta_found": false,
+ "meta_name": null,
+ "meta_symbol": null,
+ "meta_uri": null,
+ "identity_match": true,
+ "update_authority": null,
+ "authority_states": {
+  "mint": "renounced",
+  "freeze": "renounced",
+  "update": "unknown"
+ },
+ "mintR": true,
+ "freezeR": true,
+ "updateR": null,
+ "doubleR": true,
+ "deepR": false,
+ "origin": {
+  "kind": "template",
+  "evidence": [
+   "dexId=pumpfun",
+   "본딩커브 거래 중(마이그레이션 전)",
+   "launchpad=pump_fun"
+  ],
+  "has_socials": false
+ },
+ "concentration": {
+  "method": "rugcheck-report-fallback",
+  "filter_note": "getTokenLargestAccounts 실패(공개 RPC 429/장지연 — 프로브 운영 대체 계승) → RugCheck report topHolders. owner 기준 burn/infra 레지스트리 필터(1단) + 본딩커브 휴리스틱(3단 근사, probable-* 라벨로 명시) 적용.",
+  "rpc_attempt_error": "The read operation timed out",
+  "top_accounts": [
+   {
+    "account": null,
+    "owner": "7do5JUbmzFcN6mQY1q1zRTAeX63WBd6oasjhdW6KdYbp",
+    "pct_raw": 98.9365119817622,
+    "tag": "probable-bonding-curve"
+   },
+   {
+    "account": null,
+    "owner": "HxcdEi6CWzQtPCmM8E2maEZ3oYVGZxESqCWU1iPzmhVW",
+    "pct_raw": 0.9972418413674,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "GoU9mTtFwQyCSqUyqv7mtA7FSQoqftdavhztXExtvQgb",
+    "pct_raw": 0.065253142658,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "G1qTxh485KBKXbRRZEPUwyDSAtpcEiyce6AVQPa9DBEE",
+    "pct_raw": 0.0002496204483,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "9pP9xaNYmkV1cssMSmcRezSeLBck8MCxdyG5DqZQqBEE",
+    "pct_raw": 0.0002496191972,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "H5ZJtUcsf2T7DAPy6QFy1up2WsqevEvBt7GuBDbQ6BEE",
+    "pct_raw": 0.00024542874249999997,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "FpSEBjCu1LJWD6nK83hMBLMWg5fhnazLVmWwNm9ZsBEE",
+    "pct_raw": 0.000245426303,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "HK3TWdTobkjwRpV4wzdW8KZCSQm19dKd1WHqFZgzHnqu",
+    "pct_raw": 2.9395214e-06,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "X2TLFoEDYqu9Gc7dhyZ5WXf5FTAvZHeofN9BHh5Fp3j",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "894GkByxrSMTUuEw1Mcgu7DesWih5HcQ2AHYZ3EMjEv6",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "59faHNVAg4XJ3pkdPaP5ruLeoeYtKWjGnc6XhJXkbJCr",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "3yPothwahuX6yQVDy3mgNcYJNFEXsMktAzEjnXWDy5st",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   }
+  ],
+  "top10_share_raw": 100.0,
+  "top20_share_raw": 100.0,
+  "top10_share_filtered": 1.0635,
+  "total_holders": 12,
+  "launchpad": {
+   "name": "Pump.Fun",
+   "logo": "https://api.rugcheck.xyz/public/logos/pump_fun.png",
+   "url": "https://x.com/pumpfun",
+   "platform": "pump_fun"
+  }
+ },
+ "status": "ok",
+ "read_only": true,
+ "collected_at": "2026-09-26T19:30:58+00:00"
+}

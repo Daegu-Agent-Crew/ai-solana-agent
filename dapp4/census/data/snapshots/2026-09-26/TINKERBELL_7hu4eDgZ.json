@@ -1,0 +1,78 @@
+{
+ "addr": "7hu4eDgZTBpMM6BAxNgkRRqFjorpHQmehCSYAgakBAGS",
+ "expected_symbol": "TINKERBELL",
+ "source": "geckoterminal-new_pools",
+ "detected": {
+  "detected_pool": "9xg2J4HnDXrVDqppkfML5BfhjnSy5jzV7W4hXUzBSPqC",
+  "detected_at_pool_created": "2026-09-26T19:25:52Z",
+  "detected_name": "TINKERBELL / SOL",
+  "detected_symbol": "TINKERBELL"
+ },
+ "pair": {
+  "pair_id": "9xg2J4HnDXrVDqppkfML5BfhjnSy5jzV7W4hXUzBSPqC",
+  "dex_id": "bags",
+  "pair_created_at_ms": 1790450752000,
+  "liquidity_usd": null,
+  "price_usd": "0.00006788",
+  "fdv_usd": 67885.48,
+  "pair_url": "https://dexscreener.com/solana/9xg2j4hndxrvdqppkfml5bfhjnsy5jzv7w4hxuzbspqc",
+  "token_symbol": "TINKERBELL",
+  "token_name": "Tinkerbell",
+  "n_pairs_seen": 1,
+  "info_socials": false
+ },
+ "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+ "decimals": 9,
+ "supply_raw": "1000000000000000000",
+ "mint_authority": null,
+ "freeze_authority": null,
+ "metadata_pda": "99FQdzH75RcaGk1yWeu3vPMfvnF3CV99GbwpyNxMsucx",
+ "meta_found": false,
+ "meta_name": null,
+ "meta_symbol": null,
+ "meta_uri": null,
+ "identity_match": true,
+ "update_authority": null,
+ "authority_states": {
+  "mint": "renounced",
+  "freeze": "renounced",
+  "update": "unknown"
+ },
+ "mintR": true,
+ "freezeR": true,
+ "updateR": null,
+ "doubleR": true,
+ "deepR": false,
+ "origin": {
+  "kind": "custom-launch",
+  "evidence": [],
+  "has_socials": false
+ },
+ "concentration": {
+  "method": "rugcheck-report-fallback",
+  "filter_note": "getTokenLargestAccounts 실패(공개 RPC 429/장지연 — 프로브 운영 대체 계승) → RugCheck report topHolders. owner 기준 burn/infra 레지스트리 필터(1단) + 본딩커브 휴리스틱(3단 근사, probable-* 라벨로 명시) 적용.",
+  "rpc_attempt_error": "The read operation timed out",
+  "top_accounts": [
+   {
+    "account": null,
+    "owner": "FhVo3mqL8PW5pH5U2CN4XE33DokiyZnUwuGpH2hmHLuM",
+    "pct_raw": 99.99825005879158,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "AmSSH2g2uZwP8FguEzXiH6mRhLg6MWT87hPnoFE1cDc",
+    "pct_raw": 0.0017499412084171998,
+    "tag": "wallet_or_unlisted_program"
+   }
+  ],
+  "top10_share_raw": 100.0,
+  "top20_share_raw": 100.0,
+  "top10_share_filtered": 100.0,
+  "total_holders": 2,
+  "launchpad": null
+ },
+ "status": "ok",
+ "read_only": true,
+ "collected_at": "2026-09-26T19:36:36+00:00"
+}

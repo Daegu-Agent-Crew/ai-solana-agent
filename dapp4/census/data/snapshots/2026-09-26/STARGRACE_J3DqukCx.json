@@ -1,0 +1,135 @@
+{
+ "addr": "J3DqukCxnWX5Zfub6HaoaHgGEXB8dxc8yguCGy27QGFa",
+ "expected_symbol": "STARGRACE",
+ "source": "geckoterminal-new_pools",
+ "detected": {
+  "detected_pool": "EUT18qoE9NiQsBcfsoDuHrWcsmQyJH8biKcNE6gd6BQC",
+  "detected_at_pool_created": "2026-09-26T19:26:15Z",
+  "detected_name": "STARGRACE / SOL",
+  "detected_symbol": "STARGRACE"
+ },
+ "pair": {
+  "pair_id": "EUT18qoE9NiQsBcfsoDuHrWcsmQyJH8biKcNE6gd6BQC",
+  "dex_id": "pumpfun",
+  "pair_created_at_ms": 1790450775000,
+  "liquidity_usd": null,
+  "price_usd": "0.000003389",
+  "fdv_usd": 3389.19,
+  "pair_url": "https://dexscreener.com/solana/eut18qoe9niqsbcfsoduhrwcsmqyjh8bikcne6gd6bqc",
+  "token_symbol": "STARGRACE",
+  "token_name": "Liv's Stargrace Foundation",
+  "n_pairs_seen": 1,
+  "info_socials": false
+ },
+ "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+ "decimals": 6,
+ "supply_raw": "1000000000000000",
+ "mint_authority": null,
+ "freeze_authority": null,
+ "metadata_pda": "8BgST2GJZBCR1VrR1Lt8AXSk5jQjhTCBBH7kPoGAVhJ9",
+ "meta_found": false,
+ "meta_name": null,
+ "meta_symbol": null,
+ "meta_uri": null,
+ "identity_match": true,
+ "update_authority": null,
+ "authority_states": {
+  "mint": "renounced",
+  "freeze": "renounced",
+  "update": "unknown"
+ },
+ "mintR": true,
+ "freezeR": true,
+ "updateR": null,
+ "doubleR": true,
+ "deepR": false,
+ "origin": {
+  "kind": "template",
+  "evidence": [
+   "dexId=pumpfun",
+   "본딩커브 거래 중(마이그레이션 전)",
+   "launchpad=pump_fun"
+  ],
+  "has_socials": false
+ },
+ "concentration": {
+  "method": "rugcheck-report-fallback",
+  "filter_note": "getTokenLargestAccounts 실패(공개 RPC 429/장지연 — 프로브 운영 대체 계승) → RugCheck report topHolders. owner 기준 burn/infra 레지스트리 필터(1단) + 본딩커브 휴리스틱(3단 근사, probable-* 라벨로 명시) 적용.",
+  "rpc_attempt_error": "The read operation timed out",
+  "top_accounts": [
+   {
+    "account": null,
+    "owner": "EUT18qoE9NiQsBcfsoDuHrWcsmQyJH8biKcNE6gd6BQC",
+    "pct_raw": 100,
+    "tag": "probable-bonding-curve"
+   },
+   {
+    "account": null,
+    "owner": "FgjPQhefdXZpciHnyWFJyguHYSWXtwnrCuFtd6Gss1Ky",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "haqqiUUXB5gp7gDbSjpEkw3phAjQb25r86uXJsZQgWq",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "EQUiJsxnuQVj11s6JFcXowgJLMW32UZimpNgkrgSy25N",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "Fi9pCFnVgUYfU4WAyV4ky6BGpG2m8L7i4H8D72Ku5Y1C",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "AV7PjXHL5JXZ1YoYRoN9Dsstg1x2UciBupMCXcJP8gUz",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "Dd2nB2vD1XvDsdKqhtmCuh1q6tzWckkqLq3JubznKanL",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "3ZF28d3tJRdPnwzyUj8Rmuiuikh3sBzDtG5NAZups2oV",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "9Sq7tiVycMu58kfGKG68S2B7qsCcSgfQN9nBshVouDgb",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "6txsRqPDsuo5v1WFmhuAbDLyzXDTiY53vpiaHE45V2fM",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   }
+  ],
+  "top10_share_raw": 100,
+  "top20_share_raw": 100,
+  "top10_share_filtered": 0,
+  "total_holders": 10,
+  "launchpad": {
+   "name": "Pump.Fun",
+   "logo": "https://api.rugcheck.xyz/public/logos/pump_fun.png",
+   "url": "https://x.com/pumpfun",
+   "platform": "pump_fun"
+  }
+ },
+ "status": "ok",
+ "read_only": true,
+ "collected_at": "2026-09-26T19:32:50+00:00"
+}

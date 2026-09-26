@@ -1,0 +1,188 @@
+{
+ "addr": "8xWQQjZDskM2LuLbDkGxbU2b742159GFRPRuk5V4Jx9o",
+ "expected_symbol": "e/acc",
+ "source": "geckoterminal-new_pools",
+ "detected": {
+  "detected_pool": "GeUcQ9GUE8p67jnWNmr1s6DqjNhDkUizVmpkiR54LHLH",
+  "detected_at_pool_created": "2026-09-26T19:25:47Z",
+  "detected_name": "e/acc / SOL",
+  "detected_symbol": "e/acc"
+ },
+ "pair": {
+  "pair_id": "GeUcQ9GUE8p67jnWNmr1s6DqjNhDkUizVmpkiR54LHLH",
+  "dex_id": "meteoradbc",
+  "pair_created_at_ms": 1790450747000,
+  "liquidity_usd": null,
+  "price_usd": "0.00006033",
+  "fdv_usd": 60333.6,
+  "pair_url": "https://dexscreener.com/solana/geucq9gue8p67jnwnmr1s6dqjnhdkuizvmpkir54lhlh",
+  "token_symbol": "e/acc",
+  "token_name": "Effective Accelerationism",
+  "n_pairs_seen": 1,
+  "info_socials": false
+ },
+ "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+ "decimals": 6,
+ "supply_raw": "999993537849727",
+ "mint_authority": null,
+ "freeze_authority": null,
+ "metadata_pda": "DCrZPb4Yx1owCKE37fcbdNwYZDtAoms9vaTmG8c5E8C1",
+ "meta_found": false,
+ "meta_name": null,
+ "meta_symbol": null,
+ "meta_uri": null,
+ "identity_match": true,
+ "update_authority": null,
+ "authority_states": {
+  "mint": "renounced",
+  "freeze": "renounced",
+  "update": "unknown"
+ },
+ "mintR": true,
+ "freezeR": true,
+ "updateR": null,
+ "doubleR": true,
+ "deepR": false,
+ "origin": {
+  "kind": "template",
+  "evidence": [
+   "dexId=meteoradbc"
+  ],
+  "has_socials": false
+ },
+ "concentration": {
+  "method": "rugcheck-report-fallback",
+  "filter_note": "getTokenLargestAccounts 실패(공개 RPC 429/장지연 — 프로브 운영 대체 계승) → RugCheck report topHolders. owner 기준 burn/infra 레지스트리 필터(1단) + 본딩커브 휴리스틱(3단 근사, probable-* 라벨로 명시) 적용.",
+  "rpc_attempt_error": "HTTP Error 429: Too Many Requests",
+  "top_accounts": [
+   {
+    "account": null,
+    "owner": "HLnpSz9h2S4hiLQ43rnSD9XkcUThA7B8hQMKmDaiTLcC",
+    "pct_raw": 77.1586845610314,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "DLRCqCoxSkVUtneNoEeTXXJM7eRJD7YFMqaAnmbNEZRg",
+    "pct_raw": 8.830965339914682,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "Cb5QijWyPaZZXVZGGu8Nq2L7uGr9BAigdBMcqdnJgpfD",
+    "pct_raw": 2.0993556977738956,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "GEUDKx63wXKrn7ognB2gkmy8YRNkVF1hgS4sBEg9nZVm",
+    "pct_raw": 1.8245069930393634,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "7M3MqK7UC7GBv6hDmY8a4nJFcEHKmHigkjmgGxZ8MLWm",
+    "pct_raw": 1.6482135188842408,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "7jUQAoDfjdqdMVSReQDc3CACWsaEjEuNz7g2VSB6FbHx",
+    "pct_raw": 1.3879277544864175,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "3C7dHgR53bF3P2YSzaDaW57EZfh8CHu7uTen6eEEiuqe",
+    "pct_raw": 1.1238157451762245,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "Fs9RN3wAsuJKPbTmtX5eek1bhW5krNH8RkQxkFAtgNfR",
+    "pct_raw": 1.0932291145930213,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "FURrDAcbpHQVW3x4wzzNNKaJuQPqYN6aKHzbb211Dnzn",
+    "pct_raw": 0.6362253174532089,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "FVsRmsPzLfNFezBoCjiRQz688KKxjRUS9YSUM32CmxcU",
+    "pct_raw": 0.563047461175805,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "8N4QDR8m54PuV2KgHSu39QRHrNooNEK667hBeKVokZoc",
+    "pct_raw": 0.48558445328890737,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "2YczPrmdFuFGw1kS5CTLAwYaXkYS5Vm4K9EinzbU7UjP",
+    "pct_raw": 0.26623741856900707,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "8z3gDdAR5pYc8TRFXc4dGs9G4NipZ6ZGtVAEyuGmrQB7",
+    "pct_raw": 0.15566759691970392,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "GE9EzjuC1Rw8fShBrBku6afs3eB4G3bbampKweBLjC6j",
+    "pct_raw": 0.14277886675369278,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "CRLdthZ7obBqVt4TWjoTubUdcgP2KGLWGdN1kHQ5AqKX",
+    "pct_raw": 0.14231917447709222,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "3kxcF8wHKm4sEtnxjXXeUvNGeDjTmo47LgtSRg71YfG5",
+    "pct_raw": 0.1291514071861012,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "HzKH3s8Kf7f7pgvJZx2V6TzhkdHbZDurG53rXj61BVLR",
+    "pct_raw": 0.11717211165089328,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "GTY73HuTLDMTt7MLgLDLFBKymetFUfFZbdUT3msu4Gie",
+    "pct_raw": 0.1147950126903226,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "9BPwffBkodinZkdJaWcXpwHaeUbBWQc2JZxR9TtEX7CT",
+    "pct_raw": 0.11355616505430301,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "7typnAbu4ADs5TDo5rMv9ywGVUw2RGg7o92aWjM1cHzi",
+    "pct_raw": 0.10360657078822971,
+    "tag": "wallet_or_unlisted_program"
+   }
+  ],
+  "top10_share_raw": 96.366,
+  "top20_share_raw": 98.1368,
+  "top10_share_filtered": 96.366,
+  "total_holders": 229,
+  "launchpad": null
+ },
+ "status": "ok",
+ "read_only": true,
+ "collected_at": "2026-09-26T19:36:47+00:00"
+}
