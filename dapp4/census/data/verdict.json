@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-09-26T01:34:40+00:00",
+ "generated_at": "2026-09-26T01:46:26+00:00",
  "version": "verdict-v2 (CLE2-29 Phase 1) — 4스위치 + 프레임 조항",
  "input": {
-  "source": "dapp4/census/data/baseline/aggregate.json",
+  "source": "/data/data/com.termux/files/home/.openclaw/workspace/ai-solana-agent/dapp4/census/data/baseline/aggregate.json",
   "n": 95,
   "era1_n": 52,
   "era1_double_rate": 0.38461538461538464,
@@ -22,8 +22,8 @@
   "S1_floor_75pct_to_A": {
    "condition": "전체 폐기 중 템플릿(강제/주변) 폐기 비중 ≥ 0.75 → A",
    "value_coin_weighted": 0.1311,
-   "value_population_weighted": 1.0,
-   "population_note": "센서스 신규 발행 모집단 프록시(latest.json, n=8) — 무작위 프레임은 아님(검출 편향 고지).",
+   "value_population_weighted": 0.9,
+   "population_note": "센서스 신규 발행 모집단 프록시(latest.json, n=30) — 무작위 프레임은 아님(검출 편향 고지).",
    "threshold": 0.75,
    "fired": false,
    "frame": "coin-weighted (등록/가시성 프레임) — 공식 판정 축 / population-weighted 병기 고지"
