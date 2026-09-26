@@ -4,3 +4,11 @@ worker/node_modules/
 worker/.wrangler/
 .env
 .dev.vars
+
+# secrets / wallets (CLE2-29 census: 확인 후 패턴 보강 — 기존 항목 유지)
+*.env
+*.dev.vars
+*wallet*.json
+.devnet-wallet.json
+dapp4-pipeline/state.json
+__pycache__/

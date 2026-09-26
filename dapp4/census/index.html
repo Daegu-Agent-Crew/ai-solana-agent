@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#07120f" />
+  <title>권한 센서스 — 밈코인 관측 파일럿 (CLE2-29)</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <!-- 컴플라이언스 고지문 — app.js가 이 요소를 검증하며 미표시 시 렌더를 거부한다 (UI 강제) -->
+  <div id="complianceNotice" class="compliance" data-notice="교육·관측 목적 · 투자 권유 아님 · read-only">
+    <strong>교육·관측 목적 · 투자 권유 아님 · read-only</strong>
+    <span>본 페이지는 솔라나 밈코인의 권한 폐기(mint/freeze/update authority) 규범을 관측하는 비상업 대시보드입니다. 투자 권유·가격 예측이 아니며 거래 기능이 없습니다(읽기 전용). 금액 표기는 USD/SOL만 사용합니다(환율/KRW 표기 없음). 자기참조 관측(관측 주체≠발행 주체 아님) 한계를 고지합니다.</span>
+  </div>
+
+  <header class="topbar">
+    <a class="brand" href="../"><span class="brand-mark">◧</span><span>권한 센서스<small>CLE2-29 · 밈코인 관측 파일럿</small></span></a>
+    <div class="freshness" id="freshness">
+      <span class="live-dot"></span><span id="freshnessText">데이터 시각 확인 중…</span>
+      <span id="staleBadge" class="badge stale hidden">⚠ 90분 경과</span>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <span class="eyebrow">OBSERVATION CENSUS · MAINNET-BETA READ-ONLY</span>
+        <h1>밈코인 권한 폐기,<br /><em>전염인가 확산인가</em></h1>
+        <p>신규 코인의 권한 상태(민트·프리즈·메타데이터)를 매일 스냅샷으로 관측하고, 동결된 판정 함수(4스위치 + 프레임 조항)로 규범 전염(B) vs 템플릿 확산(A)을 판정합니다. 95코인 소급 프로브(2026-09-26)가 baseline입니다.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#verdict">판정 현황판</a>
+          <a class="button ghost" href="#baseline">baseline 보기</a>
+        </div>
+      </div>
+      <div class="verdict-card" id="verdictCard">
+        <div class="v-top"><span>현재 판정</span><span id="verdictSource">판정 함수 v2</span></div>
+        <div class="v-big" id="verdictBig">B 55 : A 45</div>
+        <div class="v-sub" id="verdictSub">사전 유지(스위치 0발동) — 프레임 조항 병기</div>
+        <div class="v-bar"><span class="b" style="width:55%"></span><span class="a" style="width:45%"></span></div>
+        <div class="v-legend"><span>● B 쌍둥이 전염 55</span><span>● A 단일 확산 45</span></div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="baseline 인구 통계">
+      <article><span>baseline 표본 (소급 프로브)</span><strong id="statN">95<small>코인</small></strong><i>2026-09-26 · P1~P12 동결 후 수집</i></article>
+      <article><span>이중 폐기 era-1 → era-2</span><strong id="statEra">38.5<small>%</small> → 95.3<small>%</small></strong><i>자발 시대 vs 템플릿 시대</i></article>
+      <article><span>폐기 깊이 경사 (update 권한)</span><strong id="statDepth">45.0<small>%</small> → 9.1<small>%</small></strong><i>자발은 깊고 템플릿 준수는 얕다</i></article>
+      <article><span>템플릿 폐기 비중 (코인-가중)</span><strong id="statS1">13.1<small>%</small></strong><i>S1 스위치 입력 · 프레임 조항 적용</i></article>
+    </section>
+
+    <section id="baseline" class="panel">
+      <div class="section-heading"><div><span class="eyebrow">POPULATION · DECOMPOSITION</span><h2>인구 통계 — 시대별·출처별 분해</h2></div><span class="pill">baseline 95코인</span></div>
+      <div class="decomp-grid">
+        <div class="card"><h3>시대별 표본 (E1~E4)</h3><div id="bucketsChart" class="hbar"></div><p class="muted">era-1 = 2024-01 이전(자발 층 후보) · era-2 = pump.fun 시대(템플릿)</p></div>
+        <div class="card"><h3>시대별 이중 폐기율</h3><div id="eraChart" class="hbar"></div><p class="muted">era-2 커스텀 94.3% · era-2 pump-born 100% — 템플릿 세계의 준수 제조</p></div>
+        <div class="card"><h3>출처별 층 (strata)</h3><div id="strataChart" class="hbar"></div><p class="muted">voluntary-era1 19 · era1-kept 33 · mixed-custom 33 · custom-kept 2 · template 8</p></div>
+        <div class="card"><h3>채택곡선 (일별 스냅샷)</h3><div id="adoptionCurve" class="curve"><div class="empty">스냅샷 데이터 없음 — Phase 2 관측 시작(T0 선언) 후 채택곡선이 축적됩니다.<br />baseline 단면: era-1 38.5% → era-2 95.3% (깊이 45% → 9.1%)</div></div><p class="muted">일일 신규 코인의 폐기율·깊이 시계열 (latest.json series)</p></div>
+      </div>
+    </section>
+
+    <section id="verdict" class="panel active">
+      <div class="section-heading"><div><span class="eyebrow">VERDICT BOARD · FROZEN FUNCTION v2</span><h2>판정 현황판 — 4스위치 + 프레임 조항</h2></div><span class="pill" id="verdictDate">-</span></div>
+      <table class="data-table switch-table">
+        <thead><tr><th>스위치</th><th>조건 (동결)</th><th>실측</th><th>프레임</th><th>발동</th></tr></thead>
+        <tbody id="switchRows"><tr><td colspan="5" class="empty">verdict.json 불러오는 중…</td></tr></tbody>
+      </table>
+      <div class="frame-clauses" id="frameClauses">
+        <h3>프레임 조항 (v2 신설 — 프로브 한계 1의 수정)</h3>
+        <ul id="frameClauseList">
+          <li>S1: 코인-가중(공식 판정 축) + 모집단-가중 병기 계산</li>
+          <li>공식 판정은 등록(코인-가중) 프레임 위에서 — 모집단 값은 고지 조항</li>
+          <li>pump 테일 무작위 프레임: Phase 2 센서스로 구축 예정 (PENDING)</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="census" class="panel">
+      <div class="section-heading"><div><span class="eyebrow">LIVE CENSUS · SNAPSHOT</span><h2>신규 코인 권한 스냅샷</h2></div><button id="refreshCensus" class="button ghost">새로고침</button></div>
+      <div class="stats compact" id="censusSummary" aria-label="최근 수집 요약">
+        <article><span>최근 수집</span><strong id="cN">-<small>코인</small></strong><i id="cWhen">-</i></article>
+        <article><span>민트 폐기율</span><strong id="cMint">-</strong><i>mint authority null/sink</i></article>
+        <article><span>이중 폐기율</span><strong id="cDouble">-</strong><i>mint+freeze</i></article>
+        <article><span>템플릿 비중</span><strong id="cTemplate">-</strong><i>pumpfun/pumpswap 출처</i></article>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>코인</th><th>출처</th><th>mint</th><th>freeze</th><th>update</th><th>top10 집중도</th><th>페어 연령</th></tr></thead>
+          <tbody id="coinRows"><tr><td colspan="7" class="empty">latest.json 불러오는 중…</td></tr></tbody>
+        </table>
+      </div>
+      <p class="muted small">집중도는 상위 잔액 기준 — AMM 풀 볼트·번 주소 포함 원시값과 레지스트리 필터값을 구분 표기합니다(dapp4 설계 반증 계승). 'read-only' — 이 페이지는 어떤 거래도 만들지 않습니다.</p>
+    </section>
+
+    <section class="panel" id="method">
+      <div class="section-heading"><div><span class="eyebrow">METHOD</span><h2>관측 방법</h2></div></div>
+      <div class="method-grid">
+        <div class="card"><h3>수집 (read-only)</h3><p>신규 풀 감지(GeckoTerminal new_pools) → 정준 페어 고정(DexScreener, 유동성 최대·동률 pairAddress 사전순) → 체인 권한 스냅샷(공개 mainnet-beta RPC: mint/freeze/update authority) + 상위 잔액 집중도(getTokenLargestAccounts + owner 해석). 호출 간 200ms+, 429 지수 백오프, 실행당 RPC ~400회 상한, 유료 키·서명·발송 없음.</p></div>
+        <div class="card"><h3>판정 (동결 함수 v2)</h3><p>사전 B 55 : A 45 (r8c02 동결) 위에서 4스위치(S1 템플릿 폐기 비중≥75%→A, S2 자발 밴드 부재→A, S3 혼합&lt;30%→A, S4 거짓주장률&gt;50%→B)를 순서 무관 합산·다수결(동률 A). v2는 각 스위치에 코인-가중/모집단-가중 프레임을 명시하고 S1을 병기 계산합니다.</p></div>
+        <div class="card"><h3>baseline (소급 프로브)</h3><p>2026-09-26, P1~P12 예측 패킷 동결 **이후** 수집된 95코인 증거 로그(반앵커링 순서 조항). 시대 층화 E1~E4, 유명:테일 균형, 읽기 전용 RPC ~350회. 상세: <code>dapp4/census/data/baseline/</code></p></div>
+      </div>
+    </section>
+
+    <footer>
+      <span>대구 에이전트 크루 · CLE2-29</span><span>GitHub Pages · 무빌드 vanilla JS</span><span>데이터: 공개 RPC · DexScreener · GeckoTerminal · RugCheck</span><span id="footNotice">교육·관측 목적 · 투자 권유 아님 · read-only</span>
+    </footer>
+  </main>
+
+  <div id="complianceError" class="compliance-error hidden">
+    <strong>렌더 거부 — 컴플라이언스 고지문 누락</strong>
+    <p>본 대시보드는 "교육·관측 목적 · 투자 권유 아님 · read-only" 고지문이 표시될 때만 렌더됩니다(컴플라이언스 UI 강제). HTML 원본을 확인하세요.</p>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
