@@ -1,0 +1,139 @@
+{
+ "addr": "34kBHsXhYmBqGPGARJogfFyGC1UQD6TJDxqdusQ6wc79",
+ "expected_symbol": "FLORKMUSE",
+ "source": "geckoterminal-new_pools",
+ "detected": {
+  "detected_pool": "HbY32MZRv95yuqiwDbvAYZ61kQuJ5MYVJ59nr9aJTM88",
+  "detected_at_pool_created": "2026-09-26T01:39:06Z",
+  "detected_name": "FLORKMUSE / SOL",
+  "detected_symbol": "FLORKMUSE"
+ },
+ "pair": {},
+ "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+ "decimals": 6,
+ "supply_raw": "1000000000000000",
+ "mint_authority": null,
+ "freeze_authority": null,
+ "metadata_pda": "2nnK3wdQHEspSesAGDBPMvgtmKoe6g1gtqzdL4sPVo8S",
+ "meta_found": false,
+ "meta_name": null,
+ "meta_symbol": null,
+ "meta_uri": null,
+ "identity_match": true,
+ "update_authority": null,
+ "authority_states": {
+  "mint": "renounced",
+  "freeze": "renounced",
+  "update": "unknown"
+ },
+ "mintR": true,
+ "freezeR": true,
+ "updateR": null,
+ "doubleR": true,
+ "deepR": false,
+ "origin": {
+  "kind": "template",
+  "evidence": [
+   "launchpad=pump_fun"
+  ],
+  "has_socials": null
+ },
+ "concentration": {
+  "method": "rugcheck-report-fallback",
+  "filter_note": "getTokenLargestAccounts 실패(공개 RPC 429/장지연 — 프로브 운영 대체 계승) → RugCheck report topHolders. owner 기준 burn/infra 레지스트리 필터(1단) + 본딩커브 휴리스틱(3단 근사, probable-* 라벨로 명시) 적용.",
+  "rpc_attempt_error": "HTTP Error 403: Forbidden",
+  "top_accounts": [
+   {
+    "account": null,
+    "owner": "HbY32MZRv95yuqiwDbvAYZ61kQuJ5MYVJ59nr9aJTM88",
+    "pct_raw": 97.12169934757429,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "ATAYAoqisD843d48HhtwcyeeyUWrcLgnEzjHXxvorug9",
+    "pct_raw": 1.6643530849833998,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "B1pwAM9p3rDebW1GnLi26Dne1azo2kP8eVubGQnQwDiz",
+    "pct_raw": 1.1627248232888001,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "apexpDoPm9ypJ97YoUk6eNiZHZWqqq3Ktgfmv94QAov",
+    "pct_raw": 0.0324692848471,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "3iRdPCJ6FB2Tqo5AtRR291dq91CnjzvEQZsi5ZDXtBEE",
+    "pct_raw": 0.0026837044742,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "5g1mhhTWReQ6Hi9PYqs7juvnD5JEafJSEZPyvZy6EBEE",
+    "pct_raw": 0.0026835648397,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "L22zk8ZwBNCH9taYUYsryXDPzPUXTZqDdALjnqu8BEE",
+    "pct_raw": 0.0026769242942,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "J1UETbDaRJR4x8UXFdQeLfQBCmYLkNAKJ8C9xUozfBEE",
+    "pct_raw": 0.0026767851885,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "FR1MGcD2gNBQDPTXKnT5AjNBbdQJeufXLeAuTCga3BEE",
+    "pct_raw": 0.0026766460937,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "53fwQxFLLi2vT99CuXBsL3Ywx8h4npTD5bZLYwmXQBEE",
+    "pct_raw": 0.0026763679365,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "6FGJf7qJsF84WG5qZ3uuUvPynT4f1wBHndgSuMqknBEE",
+    "pct_raw": 0.0026760898227,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "HK3TWdTobkjwRpV4wzdW8KZCSQm19dKd1WHqFZgzHnqu",
+    "pct_raw": 3.3766568999999997e-06,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "DxhpC9c4kGkYJR34xUrfFeDx9vwb6yoHUMWrTCZybwtH",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   }
+  ],
+  "top10_share_raw": 99.9973,
+  "top20_share_raw": 100.0,
+  "top10_share_filtered": 99.9973,
+  "total_holders": 13,
+  "launchpad": {
+   "name": "Pump.Fun",
+   "logo": "https://api.rugcheck.xyz/public/logos/pump_fun.png",
+   "url": "https://x.com/pumpfun",
+   "platform": "pump_fun"
+  }
+ },
+ "status": "ok",
+ "read_only": true,
+ "collected_at": "2026-09-26T01:40:43+00:00"
+}
