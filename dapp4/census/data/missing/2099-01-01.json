@@ -1,0 +1,7 @@
+{
+ "date": "2099-01-01",
+ "status": "missing",
+ "detected_by": "deadman-actions",
+ "detected_at": "2026-09-27T19:32:28Z",
+ "note": "일일 관측(04:30 KST 크론)이 05:30 KST 데드맨 점검 시점까지 도착하지 않음 — 2일 누적 시 전체 유보(PRE-REGISTRATION 참조)"
+}
