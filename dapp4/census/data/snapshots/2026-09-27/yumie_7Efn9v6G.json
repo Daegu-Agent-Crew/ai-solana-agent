@@ -1,0 +1,81 @@
+{
+ "addr": "7Efn9v6G8PN6BrzhbPxoTJTmujws3UANj7Bncrjppump",
+ "expected_symbol": "yumie",
+ "source": "geckoterminal-new_pools",
+ "detected": {
+  "detected_pool": "4DJUU2FTh79vXr8Hg3qwwspXyR1ivzokmV1z1tTnrtkn",
+  "detected_at_pool_created": "2026-09-27T19:28:06Z",
+  "detected_name": "yumie / SOL",
+  "detected_symbol": "yumie"
+ },
+ "pair": {
+  "pair_id": "4DJUU2FTh79vXr8Hg3qwwspXyR1ivzokmV1z1tTnrtkn",
+  "dex_id": "pumpfun",
+  "pair_created_at_ms": 1790537286000,
+  "liquidity_usd": null,
+  "price_usd": "0.000003446",
+  "fdv_usd": 3446.7,
+  "pair_url": "https://dexscreener.com/solana/4djuu2fth79vxr8hg3qwwspxyr1ivzokmv1z1ttnrtkn",
+  "token_symbol": "yumie",
+  "token_name": "yumiebb",
+  "n_pairs_seen": 1,
+  "info_socials": false
+ },
+ "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+ "decimals": 6,
+ "supply_raw": "1000000000000000",
+ "mint_authority": null,
+ "freeze_authority": null,
+ "metadata_pda": "BVDMMnCQxNnoRmdrpjxhj61s4KYBWU5UBfSkbFqSR3mx",
+ "meta_found": false,
+ "meta_name": null,
+ "meta_symbol": null,
+ "meta_uri": null,
+ "identity_match": true,
+ "update_authority": null,
+ "authority_states": {
+  "mint": "renounced",
+  "freeze": "renounced",
+  "update": "unknown"
+ },
+ "mintR": true,
+ "freezeR": true,
+ "updateR": null,
+ "doubleR": true,
+ "deepR": false,
+ "origin": {
+  "kind": "template",
+  "evidence": [
+   "dexId=pumpfun",
+   "본딩커브 거래 중(마이그레이션 전)",
+   "launchpad=pump_fun"
+  ],
+  "has_socials": false
+ },
+ "concentration": {
+  "method": "rugcheck-report-fallback",
+  "filter_note": "getTokenLargestAccounts 실패(공개 RPC 429/장지연 — 프로브 운영 대체 계승) → RugCheck report topHolders. owner 기준 burn/infra 레지스트리 필터(1단) + 본딩커브 휴리스틱(3단 근사, probable-* 라벨로 명시) 적용.",
+  "rpc_attempt_error": "The read operation timed out",
+  "top_accounts": [
+   {
+    "account": null,
+    "owner": "4DJUU2FTh79vXr8Hg3qwwspXyR1ivzokmV1z1tTnrtkn",
+    "pct_raw": 100,
+    "tag": "probable-bonding-curve"
+   }
+  ],
+  "top10_share_raw": 100,
+  "top20_share_raw": 100,
+  "top10_share_filtered": 0,
+  "total_holders": 1,
+  "launchpad": {
+   "name": "Pump.Fun",
+   "logo": "https://api.rugcheck.xyz/public/logos/pump_fun.png",
+   "url": "https://x.com/pumpfun",
+   "platform": "pump_fun"
+  }
+ },
+ "status": "ok",
+ "read_only": true,
+ "collected_at": "2026-09-27T19:36:30+00:00"
+}

@@ -1,0 +1,99 @@
+{
+ "addr": "8aL7tC6WmsZ7nX2RaPDh36hGBGUT46Uq1mVSWrexffik",
+ "expected_symbol": "MACON",
+ "source": "geckoterminal-new_pools",
+ "detected": {
+  "detected_pool": "Ero93MADYaCDUWD5JnvQqgzcHUo1Da7zzGjvomd2Sxu6",
+  "detected_at_pool_created": "2026-09-27T19:28:41Z",
+  "detected_name": "MACON / SOL",
+  "detected_symbol": "MACON"
+ },
+ "pair": {
+  "pair_id": "Ero93MADYaCDUWD5JnvQqgzcHUo1Da7zzGjvomd2Sxu6",
+  "dex_id": "pumpfun",
+  "pair_created_at_ms": 1790537321000,
+  "liquidity_usd": null,
+  "price_usd": "0.000002656",
+  "fdv_usd": 2656.03,
+  "pair_url": "https://dexscreener.com/solana/ero93madyacduwd5jnvqqgzchuo1da7zzgjvomd2sxu6",
+  "token_symbol": "MACON",
+  "token_name": "Magic Season",
+  "n_pairs_seen": 1,
+  "info_socials": false
+ },
+ "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+ "decimals": 6,
+ "supply_raw": "2000000000000000",
+ "mint_authority": null,
+ "freeze_authority": null,
+ "metadata_pda": "E3dVKKvBm3hYx8mAe3kEcmy9zgJCuvfv7Ww1TTv1TMp7",
+ "meta_found": false,
+ "meta_name": null,
+ "meta_symbol": null,
+ "meta_uri": null,
+ "identity_match": true,
+ "update_authority": null,
+ "authority_states": {
+  "mint": "renounced",
+  "freeze": "renounced",
+  "update": "unknown"
+ },
+ "mintR": true,
+ "freezeR": true,
+ "updateR": null,
+ "doubleR": true,
+ "deepR": false,
+ "origin": {
+  "kind": "template",
+  "evidence": [
+   "dexId=pumpfun",
+   "본딩커브 거래 중(마이그레이션 전)",
+   "launchpad=pump_fun"
+  ],
+  "has_socials": false
+ },
+ "concentration": {
+  "method": "rugcheck-report-fallback",
+  "filter_note": "getTokenLargestAccounts 실패(공개 RPC 429/장지연 — 프로브 운영 대체 계승) → RugCheck report topHolders. owner 기준 burn/infra 레지스트리 필터(1단) + 본딩커브 휴리스틱(3단 근사, probable-* 라벨로 명시) 적용.",
+  "rpc_attempt_error": "HTTP Error 429: Too Many Requests",
+  "top_accounts": [
+   {
+    "account": null,
+    "owner": "BwWK17cbHxwWBKZkUYvzxLcNQ1YVyaFezduWbtm2de6s",
+    "pct_raw": 58.43414561762466,
+    "tag": "probable-bonding-curve"
+   },
+   {
+    "account": null,
+    "owner": "Ero93MADYaCDUWD5JnvQqgzcHUo1Da7zzGjvomd2Sxu6",
+    "pct_raw": 41.56585438237535,
+    "tag": "probable-bonding-curve"
+   },
+   {
+    "account": null,
+    "owner": "AoitFUatYHUBZQi7fHZMjRVrhep6TPuoxP4t28ye2vUN",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "3ep8j4RVF5uPAkn4mgsMsL3an1CoSWYuWFhJPLWeSoup",
+    "pct_raw": 0,
+    "tag": "wallet_or_unlisted_program"
+   }
+  ],
+  "top10_share_raw": 100.0,
+  "top20_share_raw": 100.0,
+  "top10_share_filtered": 0,
+  "total_holders": 4,
+  "launchpad": {
+   "name": "Pump.Fun",
+   "logo": "https://api.rugcheck.xyz/public/logos/pump_fun.png",
+   "url": "https://x.com/pumpfun",
+   "platform": "pump_fun"
+  }
+ },
+ "status": "ok",
+ "read_only": true,
+ "collected_at": "2026-09-27T19:32:22+00:00"
+}

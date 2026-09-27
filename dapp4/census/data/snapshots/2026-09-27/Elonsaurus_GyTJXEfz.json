@@ -1,0 +1,99 @@
+{
+ "addr": "GyTJXEfzG2fnUpvmHG8bqtZRcmQfA6Pob4x9AB4Apump",
+ "expected_symbol": "Elonsaurus",
+ "source": "geckoterminal-new_pools",
+ "detected": {
+  "detected_pool": "7MYVdZCEov3HfPFt14MtgesGnRwBTPLg6U6A1sjGzGjE",
+  "detected_at_pool_created": "2026-09-27T19:28:50Z",
+  "detected_name": "Elonsaurus / SOL",
+  "detected_symbol": "Elonsaurus"
+ },
+ "pair": {
+  "pair_id": "7MYVdZCEov3HfPFt14MtgesGnRwBTPLg6U6A1sjGzGjE",
+  "dex_id": "pumpfun",
+  "pair_created_at_ms": 1744089457000,
+  "liquidity_usd": null,
+  "price_usd": "0.000003672",
+  "fdv_usd": 3672.8,
+  "pair_url": "https://dexscreener.com/solana/7myvdzceov3hfpft14mtgesgnrwbtplg6u6a1sjgzgje",
+  "token_symbol": "Elonsaurus",
+  "token_name": "Elonsaurus",
+  "n_pairs_seen": 1,
+  "info_socials": false
+ },
+ "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+ "decimals": 6,
+ "supply_raw": "1000000000000000",
+ "mint_authority": null,
+ "freeze_authority": null,
+ "metadata_pda": "EFY1a581BagB4UVDwhzaYcgXdE2NZ8doThUP82gcJ67U",
+ "meta_found": false,
+ "meta_name": null,
+ "meta_symbol": null,
+ "meta_uri": null,
+ "identity_match": true,
+ "update_authority": null,
+ "authority_states": {
+  "mint": "renounced",
+  "freeze": "renounced",
+  "update": "unknown"
+ },
+ "mintR": true,
+ "freezeR": true,
+ "updateR": null,
+ "doubleR": true,
+ "deepR": false,
+ "origin": {
+  "kind": "template",
+  "evidence": [
+   "dexId=pumpfun",
+   "본딩커브 거래 중(마이그레이션 전)",
+   "launchpad=pump_fun"
+  ],
+  "has_socials": false
+ },
+ "concentration": {
+  "method": "rugcheck-report-fallback",
+  "filter_note": "getTokenLargestAccounts 실패(공개 RPC 429/장지연 — 프로브 운영 대체 계승) → RugCheck report topHolders. owner 기준 burn/infra 레지스트리 필터(1단) + 본딩커브 휴리스틱(3단 근사, probable-* 라벨로 명시) 적용.",
+  "rpc_attempt_error": "HTTP Error 429: Too Many Requests",
+  "top_accounts": [
+   {
+    "account": null,
+    "owner": "7MYVdZCEov3HfPFt14MtgesGnRwBTPLg6U6A1sjGzGjE",
+    "pct_raw": 94.3160761880664,
+    "tag": "probable-bonding-curve"
+   },
+   {
+    "account": null,
+    "owner": "Amxbqjznnb7s9sp9UJbUiSfEWTAYWbJmRfjcNeq1RogH",
+    "pct_raw": 3.4297586640601,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "B4HpqF8sHpU7iGKz3rQmV2oWccDwpuChB9AYTFT7AoQj",
+    "pct_raw": 2.2509874653264,
+    "tag": "wallet_or_unlisted_program"
+   },
+   {
+    "account": null,
+    "owner": "F2SsGGeGiDAyqhayraMo97R5ikinsVm6MgZyHSpHNq9e",
+    "pct_raw": 0.0031776825471,
+    "tag": "wallet_or_unlisted_program"
+   }
+  ],
+  "top10_share_raw": 100.0,
+  "top20_share_raw": 100.0,
+  "top10_share_filtered": 5.6839,
+  "total_holders": 4,
+  "launchpad": {
+   "name": "Pump.Fun",
+   "logo": "https://api.rugcheck.xyz/public/logos/pump_fun.png",
+   "url": "https://x.com/pumpfun",
+   "platform": "pump_fun"
+  }
+ },
+ "status": "ok",
+ "read_only": true,
+ "collected_at": "2026-09-27T19:31:17+00:00"
+}
