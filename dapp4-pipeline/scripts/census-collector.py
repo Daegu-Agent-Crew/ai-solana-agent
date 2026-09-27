@@ -22,6 +22,12 @@ CLI:
   python3 census-collector.py --coins 8 --dry-run     # 감지만
   python3 census-collector.py --coins 8               # 스냅샷 생성 + latest.json 갱신
   python3 census-collector.py --coins 30 --out /tmp/x # 출력 경로 지정
+  python3 census-collector.py --sample 10             # 무작위 표본 편향 점검(당일 시드 결정론적)
+
+RPC 소비자 로그(CLE2-29 운영 방어):
+  rpc() 호출 1건당 1줄을 $HOME/.rpc/<KST-date>.<consumer>.log에 append.
+  실행 시작 시 오늘 로그 줄수 + 예상 호출수 > 일한도(기본 250, --rpc-budget)면 즉시 중단(fail-closed).
+  로그 파일 파싱 불가(손상) 시에도 중단(한도 소진 간주).
 """
 
 import argparse
@@ -31,6 +37,8 @@ import datetime as dt
 import hashlib
 import json
 import os
+import random
+import re
 import sys
 import time
 import urllib.error
@@ -180,6 +188,82 @@ BACKOFF_BASE = 0.6
 BACKOFF_MAX = 20.0
 RETRIES = 5
 
+# ─────────────────────────────────────────────────────────────────
+# RPC 소비자 로그 + 일한도 (CLE2-29 운영 방어 — fail-closed)
+# ─────────────────────────────────────────────────────────────────
+
+KST = dt.timezone(dt.timedelta(hours=9))
+RPC_CONSUMER = {"name": "dg1", "daily_budget": 250}
+RPC_SAMPLE_BUDGET = 120  # --sample 실행별 별도 상한 (~코인당 12회)
+RPC_LOG_LINE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+09:00 \S+ \S+ total=\d+$")
+
+
+class DailyBudgetExceeded(RuntimeError):
+    """소비자 일일 RPC 한도 초과(또는 로그 손상) — fail-closed 중단."""
+
+
+def kst_today() -> str:
+    return dt.datetime.now(KST).strftime("%Y-%m-%d")
+
+
+def rpc_log_dir() -> str:
+    return os.path.join(os.path.expanduser("~"), ".rpc")
+
+
+def rpc_log_path() -> str:
+    return os.path.join(rpc_log_dir(), f"{kst_today()}.{RPC_CONSUMER['name']}.log")
+
+
+def read_rpc_log_count() -> int:
+    """오늘 로그의 유효 호출 줄수. 파일 없음 → 0. 파싱 불가(손상) → 예외(fail-closed)."""
+    path = rpc_log_path()
+    if not os.path.exists(path):
+        return 0
+    n = 0
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                if not RPC_LOG_LINE_RE.match(line):
+                    raise DailyBudgetExceeded(
+                        f"RPC 로그 손상(파싱 불가, 한도 소진 간주): {path} — 비정상 줄: {line[:80]!r}"
+                    )
+                n += 1
+    except DailyBudgetExceeded:
+        raise
+    except OSError as e:
+        raise DailyBudgetExceeded(f"RPC 로그 읽기 실패(한도 소진 간주): {path} — {e}")
+    return n
+
+
+def rpc_log_append(method: str, endpoint: str):
+    """rpc() 호출 1건당 1줄 append — 기록 실패 시 즉시 중단(fail-closed)."""
+    os.makedirs(rpc_log_dir(), exist_ok=True)
+    host = endpoint.split("//", 1)[-1].split("/", 1)[0]
+    line = (
+        f"{dt.datetime.now(KST).isoformat(timespec='seconds')} {method.lower()} {host} total={RPC_CALLS['n']}\n"
+    )
+    try:
+        with open(rpc_log_path(), "a", encoding="utf-8") as f:
+            f.write(line)
+    except OSError as e:
+        raise DailyBudgetExceeded(f"RPC 로그 append 실패(소비 기록 불가 → 중단): {rpc_log_path()} — {e}")
+
+
+def enforce_daily_budget(planned_calls: int, purpose: str):
+    """실행 시작 시 fail-closed 점검: 이미 사용 + 예상 > 일한도 → 중단."""
+    used = read_rpc_log_count()  # 손상 시 예외 전파(fail-closed)
+    budget = RPC_CONSUMER["daily_budget"]
+    if used + planned_calls > budget:
+        raise DailyBudgetExceeded(
+            f"소비자 {RPC_CONSUMER['name']!r} 일한도 초과 예상({purpose}): "
+            f"오늘 {used}회 사용 + 예상 {planned_calls}회 > 한도 {budget}회 — 즉시 중단(fail-closed). "
+            f"로그: {rpc_log_path()}"
+        )
+    print(f"[rpc-budget] 오늘 {RPC_CONSUMER['name']} 사용 {used}/{budget}회 + 예상 {planned_calls}회({purpose}) — 허용")
+
 
 class BudgetExceeded(RuntimeError):
     pass
@@ -241,6 +325,7 @@ def rpc(method: str, params: list, timeout: int = 30):
             time.sleep(min(BACKOFF_BASE * (2**attempt), BACKOFF_MAX))
             continue
         RPC_CALLS["n"] += 1
+        rpc_log_append(method, endpoint)
         if "error" in out:
             raise RuntimeError(f"RPC 오류 {method}: {out['error']}")
         return out.get("result")
@@ -638,22 +723,138 @@ def summarize(records: list) -> dict:
     }
 
 
+# ─────────────────────────────────────────────────────────────────
+# 3.5) 무작위 표본 편향 점검 (--sample N)
+# ─────────────────────────────────────────────────────────────────
+
+def run_sample(args, t0: float) -> int:
+    """검출된 신규 코인 풀에서 KST 오늘 날짜 시드로 결정론적 무작위 표본 N개 스냅샷.
+    일일 전수 관측(latest.json series)과 별개 파일 — random-sample/<KST-date>.json.
+    RPC 상한 별도 가드: 실행당 RPC_SAMPLE_BUDGET(120)회."""
+    global RPC_BUDGET
+    RPC_BUDGET = min(args.budget, RPC_SAMPLE_BUDGET)
+    n = max(1, min(args.sample, 25))
+
+    seed_str = kst_today()
+    seed = int(hashlib.sha256(seed_str.encode()).hexdigest(), 16)
+
+    print(f"[sample] 신규 풀 감지 시작 (표본 {n}코인, 시드소스={seed_str})…")
+    detected = discover_new_coins(n + 15)  # 여유분 후보 풀
+    canonical = enrich_pairs(list(detected.keys()))
+    pool = sorted(m for m in detected if canonical.get(m))  # 정준 페어 있는 후보만(정렬로 순서 안정화)
+    if not pool:
+        print("[sample] 후보 풀 비었음 — 종료(기록 없음)")
+        return 1
+    rng = random.Random(seed)
+    chosen = rng.sample(pool, min(n, len(pool)))
+    print(f"[sample] 후보 {len(pool)}코인 중 결정론적 선택 {len(chosen)}코인 (seed={seed % 10**8}…)")
+
+    records, skipped = [], []
+    for mint in chosen:
+        det, pinfo = detected[mint], canonical.get(mint) or {}
+        try:
+            rec = snapshot_coin(mint, det, pinfo)
+        except BudgetExceeded as e:
+            print(f"[budget] {e} — 표본 중단(부분 결과 기록)")
+            skipped.append(mint)
+            break
+        except Exception as e:
+            print(f"[warn] {mint[:8]}… 표본 수집 실패: {e}")
+            skipped.append(mint)
+            continue
+        records.append(rec)
+        states = rec.get("authority_states", {})
+        print(f"  ✓ {(rec.get('expected_symbol') or '?'):<12} mint={states.get('mint', '?'):<14} "
+              f"freeze={states.get('freeze', '?'):<14} update={states.get('update', '?'):<14} "
+              f"origin={rec.get('origin', {}).get('kind', '?')}")
+
+    out_root = os.path.normpath(args.out or os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "..", "..", "dapp4", "census", "data"))
+    sample_dir = os.path.join(out_root, "random-sample")
+    os.makedirs(sample_dir, exist_ok=True)
+
+    ok = [r for r in records if r.get("status") == "ok"]
+    m = sum(1 for r in ok if r.get("mintR"))
+    d = sum(1 for r in ok if r.get("doubleR"))
+    dep = sum(1 for r in ok if r.get("deepR"))
+    kinds = {}
+    for r in ok:
+        k = r.get("origin", {}).get("kind", "?")
+        kinds[k] = kinds.get(k, 0) + 1
+    doc = {
+        "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+        "kst_date": seed_str,
+        "mode": "random-sample",
+        "purpose": "무작위 표본 편향 점검 — 일일 전수 관측(latest.json)과 독립 프레임",
+        "selection": {
+            "seed_source": f"sha256('{seed_str}')",
+            "candidate_pool": len(pool),
+            "requested_n": n,
+            "selected_n": len(records),
+            "deterministic": True,
+            "skipped": skipped,
+        },
+        "summary": {
+            "n": len(ok),
+            "mint_renounced": m, "double_renounced": d, "deep_renounced": dep,
+            "mint_ren_rate": round(m / len(ok), 4) if ok else None,
+            "double_ren_rate": round(d / len(ok), 4) if ok else None,
+            "deep_ren_rate": round(dep / len(ok), 4) if ok else None,
+            "origin_kinds": kinds,
+        },
+        "rpc_calls": RPC_CALLS["n"],
+        "rpc_budget_this_run": RPC_BUDGET,
+        "consumer_daily_used_after": read_rpc_log_count(),
+        "coins": [{
+            "addr": r["addr"], "expected_symbol": r.get("expected_symbol"),
+            "origin": r.get("origin"), "authority_states": r.get("authority_states"),
+            "mintR": r.get("mintR"), "freezeR": r.get("freezeR"),
+            "doubleR": r.get("doubleR"), "deepR": r.get("deepR"),
+            "status": r.get("status"),
+        } for r in records],
+        "compliance": {"purpose": "교육·관측 목적 · 투자 권유 아님 · read-only", "currency": "USD/SOL only"},
+    }
+    out_path = os.path.join(sample_dir, f"{seed_str}.json")
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(doc, f, ensure_ascii=False, indent=1)
+    print(f"[sample] 요약: {json.dumps(doc['summary'], ensure_ascii=False)}")
+    print(f"[sample] 기록 → {out_path}")
+    print(f"[sample] RPC {RPC_CALLS['n']}회 / 표본 상한 {RPC_BUDGET}회 · {time.time() - t0:.1f}초")
+    return 0
+
+
 def main():
     global RPC_BUDGET
     ap = argparse.ArgumentParser(description="CLE2-29 권한 센서스 수집기 (read-only)")
     ap.add_argument("--coins", type=int, default=30, help="수집 코인 수(기본 30, 최대 100)")
     ap.add_argument("--dry-run", action="store_true", help="신규 코인 감지만 수행(파일 기록 없음)")
     ap.add_argument("--out", default=None, help="출력 루트(기본: 리포 dapp4/census/data)")
-    ap.add_argument("--budget", type=int, default=RPC_BUDGET, help="RPC 호출 상한(기본 400)")
+    ap.add_argument("--budget", type=int, default=RPC_BUDGET, help="RPC 호출 상한(기본 400, --sample 시 120으로 축소)")
+    ap.add_argument("--sample", type=int, default=None, metavar="N",
+                    help="무작위 표본 N코인 편향 점검 — KST 오늘 날짜 시드 결정론적 선택, random-sample/<date>.json 기록")
+    ap.add_argument("--rpc-budget", type=int, default=250, dest="rpc_budget",
+                    help="소비자 일일 RPC 한도(기본 250) — $HOME/.rpc/<date>.<consumer>.log 줄수 기준 fail-closed")
+    ap.add_argument("--consumer", default="dg1", help="RPC 소비자명(로그 접미사, 기본 dg1)")
     args = ap.parse_args()
-    RPC_BUDGET = args.budget
-    n = max(1, min(args.coins, 100))
+    if not re.fullmatch(r"[a-z0-9-]{1,16}", args.consumer or ""):
+        print(f"잘못된 소비자명: {args.consumer!r}", file=sys.stderr)
+        return 2
+    RPC_CONSUMER["name"] = args.consumer
+    RPC_CONSUMER["daily_budget"] = args.rpc_budget
 
     t0 = time.time()
     # 자체 검증: BONK 메타데이터 PDA 순수 파이썬 유도가 프로브 실측값과 일치하는지
     bonk_pda = metadata_pda("DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263")
     assert bonk_pda == "FDZZbyY9XGpL3CNKUZxLk3wFTTQYL3TkDiDzqxrizcPN", f"PDA 자체검증 실패: {bonk_pda}"
     print(f"[selftest] Metaplex PDA 유도 OK (BONK → {bonk_pda[:8]}…)")
+
+    if args.sample is not None:
+        enforce_daily_budget(min(args.sample, 25) * 12 + 10, purpose=f"--sample {args.sample}")
+        return run_sample(args, t0)
+
+    RPC_BUDGET = args.budget
+    n = max(1, min(args.coins, 100))
+    enforce_daily_budget(n * 4 + 15, purpose=f"--coins {n} 전수 관측")
 
     print(f"[detect] 신규 풀 감지 시작 (목표 {n}코인)…")
     detected = discover_new_coins(n)
@@ -740,4 +941,8 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except DailyBudgetExceeded as e:
+        print(f"[fail-closed] {e}", file=sys.stderr)
+        sys.exit(2)

@@ -1,0 +1,76 @@
+# census-smoke.yml — CLE2-29 배포 후 스모크 테스트 (L2 자동 검사)
+# 매일 06:00 KST (cron 21:00 UTC) + 수동 실행. 실패 시 이슈 자동 생성.
+# 시간대 원칙: KST 단일화 (env TZ=Asia/Seoul, cron은 UTC 표기 = KST-9)
+name: census-smoke
+
+on:
+  schedule:
+    - cron: "0 21 * * *"   # 06:00 KST
+  workflow_dispatch:
+
+env:
+  TZ: Asia/Seoul
+
+permissions:
+  issues: write
+  contents: read
+
+concurrency:
+  group: census-smoke
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    outputs:
+      failed: ${{ steps.smoke.outcome == 'failure' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: playwright chromium 설치
+        run: |
+          cd dapp4-pipeline/scripts
+          npm init -y >/dev/null 2>&1
+          npm install --no-audit --no-fund playwright
+          npx playwright install --with-deps chromium
+
+      - name: 스모크 테스트 실행
+        id: smoke
+        working-directory: dapp4-pipeline/scripts
+        run: node smoke-test.mjs
+
+      - name: 스크린샷 artifact 업로드
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-screenshots-${{ github.run_id }}
+          path: |
+            dapp4-pipeline/scripts/artifacts/*.png
+            dapp4-pipeline/scripts/smoke-failure.txt
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: 실패 시 이슈 생성
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          TITLE="🚨 census 스모크 실패"
+          BODY=$(cat dapp4-pipeline/scripts/smoke-failure.txt 2>/dev/null || echo "실패 요약 파일 없음 — run 로그 참조")
+          # 동일 제목 오픈 이슈 있으면 코멘트로 갱신(스팸 방지), 없으면 신규 생성
+          EXISTING=$(gh issue list --state open --search "in:title ${TITLE}" --json number --jq '.[0].number' || true)
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "재발 — ${RUN_URL}
+
+          ${BODY}"
+            echo "기존 이슈 #${EXISTING}에 코멘트"
+          else
+            gh issue create --title "${TITLE}" --body "${RUN_URL}
+
+          ${BODY}" --label "" && echo "이슈 생성 완료"
+          fi

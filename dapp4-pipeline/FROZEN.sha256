@@ -1,0 +1,5 @@
+# FROZEN.sha256 — CLE2-29 판정 함수 동결 매니페스트
+# 대상: dapp4-pipeline/scripts/verdict-v2.py (판정 v2 — 10/3 판정 전 본문 수정 금지)
+# 해제 방법: 10/3 판정 후 PR에서 매니페스트 갱신(새 해시로 교체 + 본 파일 이 줄 주석 갱신).
+# 검증: sha256sum -c dapp4-pipeline/FROZEN.sha256 (CI: freeze-guard.yml)
+1dd46b9ea6408a12ead20ce68c4c38e971ab3bc873b0e1037b34761dd9221eed  dapp4-pipeline/scripts/verdict-v2.py

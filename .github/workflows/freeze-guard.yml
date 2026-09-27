@@ -1,0 +1,24 @@
+# freeze-guard.yml — CLE2-29 판정 함수 동결 감시
+# verdict-v2.py 본문이 FROZEN.sha256 매니페스트와 불일치하면 CI 실패.
+# 해제(매니페스트 갱신)는 10/3 판정 이후 PR에서만 — OPS.md 참조.
+name: freeze-guard
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 판정 파일 해시 검증 (FROZEN.sha256)
+        run: |
+          echo "동결 대상:"
+          cat dapp4-pipeline/FROZEN.sha256
+          echo "---"
+          sha256sum -c dapp4-pipeline/FROZEN.sha256
