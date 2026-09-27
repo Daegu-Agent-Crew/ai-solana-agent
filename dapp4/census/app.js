@@ -8,7 +8,7 @@
   "use strict";
 
   var NOTICE = "교육·관측 목적 · 투자 권유 아님 · read-only";
-  var STALE_MIN = 90; // 신선도 경계(분) — dapp4 설계 계승
+  var STALE_MIN = 1560; // 신선도 경계(분) — 일일 수집 파이프라인 기준 26시간(수집일+2h 여유). 90분은 dapp4 실시간 관측 설계 계승이나 CLE2-29 센서스는 일 1회 수집이므로 26h로 조정(2026-09-27)
 
   /* ── 컴플라이언스 게이트 ─────────────────────────────── */
   function complianceGate() {
@@ -50,7 +50,7 @@
     });
   }
 
-  /* ── 신선도 라벨 (90분 경과 경고 배지) ───────────────── */
+  /* ── 신선도 라벨 (수집 지연 경고 배지 — 일일 크론 기준 26h) ── */
   function freshness(iso) {
     var el = $("freshnessText"), badge = $("staleBadge");
     if (!iso) { el.textContent = "스냅샷 없음(baseline 모드)"; return; }
