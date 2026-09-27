@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>밈코인 관측 · 쉬운 버전 | CLE2-29</title>
+<style>
+  /* 밝고 부드러운 톤 — 전문가 버전(어두운 배경)과 확연히 다르게 */
+  :root {
+    --bg: #fbf8f3;
+    --card: #ffffff;
+    --ink: #2b2a33;
+    --ink-soft: #5d5b6a;
+    --line: #ece6dc;
+    --b: #2a9d8f;        /* B: 문화가 번졌나 */
+    --b-soft: #e3f4f1;
+    --a: #e07a3f;        /* A: 공장 초기값 */
+    --a-soft: #fdeee3;
+    --deep: #7b61c9;
+    --ok: #2f8f4e;
+    --ok-soft: #e4f5e8;
+    --no: #c2453d;
+    --no-soft: #fbe7e5;
+    --unk: #8a8797;
+    --unk-soft: #efedf3;
+    --notice: #fff6d6;
+    --notice-line: #f0d77a;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { font-size: 1.7rem; line-height: 1.35; margin: 8px 0 4px; }
+  h2 { font-size: 1.35rem; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+  h3 { font-size: 1.1rem; margin: 0 0 6px; }
+  p { margin: 0 0 10px; }
+  a { color: #2466b8; }
+  .sub { color: var(--ink-soft); font-size: .95rem; }
+  .small { font-size: .88rem; color: var(--ink-soft); }
+
+  /* 고지문 */
+  .notice {
+    background: var(--notice);
+    border: 2px solid var(--notice-line);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+  }
+  .notice strong { display: block; font-size: 1.05rem; margin-bottom: 4px; }
+  .notice p { margin: 0; font-size: .93rem; color: #5a4a12; }
+
+  section.card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    margin: 18px 0;
+    box-shadow: 0 2px 10px rgba(60, 40, 10, .04);
+  }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
+  .tile {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+    background: #fffdfa;
+  }
+  .tile .big { font-size: 2rem; font-weight: 800; line-height: 1.2; }
+  .tile .label { font-weight: 700; margin-bottom: 4px; }
+  .tile .mean { font-size: .92rem; color: var(--ink-soft); margin-top: 6px; }
+
+  /* 한눈에 보기 */
+  .hero-sentence { font-size: 1.45rem; font-weight: 700; line-height: 1.55; margin: 6px 0 12px; }
+  .hl { color: var(--b); font-size: 1.15em; font-weight: 900; }
+  .meter { height: 18px; background: var(--unk-soft); border-radius: 999px; overflow: hidden; margin: 8px 0 4px; }
+  .meter > span { display: block; height: 100%; background: var(--b); border-radius: 999px; }
+
+  /* 열쇠 카드 */
+  .key-emoji { font-size: 2.2rem; line-height: 1; margin-bottom: 8px; }
+  .analogy { background: var(--b-soft); border-radius: 14px; padding: 14px 16px; margin-top: 14px; }
+
+  /* 표 */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .96rem; }
+  th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+  th { font-size: .88rem; color: var(--ink-soft); font-weight: 700; }
+  .sym { font-weight: 800; }
+  .badge {
+    display: inline-block; padding: 2px 10px; border-radius: 999px;
+    font-size: .85rem; font-weight: 700; white-space: nowrap; margin: 2px 2px 2px 0;
+  }
+  .b-ok { background: var(--ok-soft); color: var(--ok); }
+  .b-no { background: var(--no-soft); color: var(--no); }
+  .b-unk { background: var(--unk-soft); color: var(--unk); }
+  .b-fired { background: var(--a-soft); color: #a44d17; }
+  .b-idle { background: var(--unk-soft); color: #5d5b6a; }
+
+  /* 게임판 */
+  .score-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+  .score-name { width: 132px; flex-shrink: 0; font-weight: 700; font-size: .95rem; line-height: 1.35; }
+  .score-bar { flex: 1; height: 30px; background: #f3efe8; border-radius: 10px; overflow: hidden; }
+  .score-bar > span { display: flex; align-items: center; justify-content: flex-end; height: 100%; padding-right: 10px; color: #fff; font-weight: 800; border-radius: 10px; min-width: 42px; }
+  .verdict-box { border-radius: 14px; padding: 14px 16px; margin: 14px 0; font-weight: 700; }
+  .v-b { background: var(--b-soft); }
+  .v-a { background: var(--a-soft); }
+  .v-unk { background: var(--unk-soft); }
+  .switch { border-left: 5px solid var(--line); }
+  .switch.fired { border-left-color: var(--a); }
+
+  /* 그래프 */
+  .chart { width: 100%; height: auto; display: block; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .9rem; margin-top: 6px; }
+  .legend i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+  .error { background: var(--no-soft); color: var(--no); border-radius: 12px; padding: 12px 14px; font-weight: 700; }
+  .loading { color: var(--unk); }
+  footer { margin-top: 28px; }
+  .btn {
+    display: inline-block; background: var(--ink); color: #fff; text-decoration: none;
+    padding: 12px 20px; border-radius: 999px; font-weight: 700; margin: 6px 0 16px;
+  }
+  #guard-error { display: none; }
+
+  /* 휴대폰(좁은 화면): 표를 카드처럼 세로 1단으로 */
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    h1 { font-size: 1.4rem; }
+    .hero-sentence { font-size: 1.2rem; }
+    section.card { padding: 18px 14px; }
+    .score-name { width: 96px; font-size: .85rem; }
+    table, thead, tbody, tr, td { display: block; width: 100%; }
+    thead { display: none; }
+    tr { border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px; margin-bottom: 10px; background: #fffdfa; }
+    td { border: none; padding: 4px 0; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    td::before { content: attr(data-label); color: var(--ink-soft); font-size: .85rem; font-weight: 700; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 고지문 (필수 — 없으면 본문이 표시되지 않음) -->
+  <div class="notice" id="notice-top" data-notice="교육·관측 목적 · 투자 권유 아님 · read-only" role="note">
+    <strong>교육·관측 목적 · 투자 권유 아님 · read-only</strong>
+    <p>이 페이지는 밈코인을 <b>관찰하고 배우기 위한</b> 교육용 화면이에요. 어떤 코인도 사거나 팔라고 권하지 않아요(투자 권유 아님). 거래 기능은 전혀 없어요. 금액은 달러(USD)와 SOL 단위로만 적고, 환율 표기는 없어요.</p>
+  </div>
+
+  <!-- 고지문 검사 실패 시에만 보이는 안내 -->
+  <div id="guard-error" class="error" role="alert">
+    안전 고지문을 찾을 수 없어서 내용을 보여드릴 수 없어요. 페이지 관리자에게 알려 주세요.
+  </div>
+
+  <main id="app" hidden>
+    <header>
+      <p class="sub">CLE2-29 밈코인 관측 파일럿 · 쉬운 버전</p>
+      <h1>🔍 새로 나온 밈코인, 만든 사람은 “열쇠”를 버렸을까?</h1>
+      <p class="sub" id="updated">자료를 불러오는 중이에요…</p>
+    </header>
+
+    <!-- 1. 한눈에 보기 -->
+    <section class="card" id="sec-hero" aria-labelledby="h-hero">
+      <h2 id="h-hero">👀 한눈에 보기</h2>
+      <div id="hero-body"><p class="loading">불러오는 중이에요…</p></div>
+    </section>
+
+    <!-- 2. 열쇠 이야기 -->
+    <section class="card" aria-labelledby="h-keys">
+      <h2 id="h-keys">🔑 열쇠 이야기: 무엇을 보고 있나요?</h2>
+      <p>밈코인(재미로 만든 암호화폐)을 만든 사람은 처음에 <b>특별한 열쇠 3개</b>를 갖고 시작해요. 우리는 만든 사람이 이 열쇠를 <b>스스로 버렸는지</b>만 지켜봐요.</p>
+      <div class="grid">
+        <div class="tile">
+          <div class="key-emoji" aria-hidden="true">🖨️</div>
+          <h3>새 코인 찍기 열쇠</h3>
+          <p class="small">코인을 마음대로 더 만들어낼 수 있는 열쇠예요. 이걸 쥐고 있으면 만든 사람이 언제든 물량을 늘려서 값을 무너뜨릴 수 있어요.</p>
+        </div>
+        <div class="tile">
+          <div class="key-emoji" aria-hidden="true">🧊</div>
+          <h3>통장 얼리기 열쇠</h3>
+          <p class="small">다른 사람의 지갑(통장)을 꽁꽁 얼려서 코인을 못 움직이게 만들 수 있는 열쇠예요.</p>
+        </div>
+        <div class="tile">
+          <div class="key-emoji" aria-hidden="true">🪧</div>
+          <h3>간판 바꾸기 열쇠</h3>
+          <p class="small">코인의 이름과 그림(간판)을 나중에 바꿀 수 있는 열쇠예요.</p>
+        </div>
+      </div>
+      <div class="analogy">
+        <p><b>🌊 권한 반납 = 열쇠를 바다에 버리기</b><br>
+        한 번 버리면 만든 사람을 포함해 <b>누구도 다시 쓸 수 없어요.</b> 그래서 “나중에 몰래 속일 방법”이 사라지는 구조가 돼요.</p>
+        <p class="small" style="margin:0">
+          · <b>두 개 반납</b> = 찍기 열쇠 + 얼리기 열쇠를 둘 다 버린 것<br>
+          · <b>세 개 모두 반납</b> = 여기에 간판 바꾸기 열쇠까지 버린 것<br>
+          · 단, 열쇠를 버렸다고 “좋은 코인”이라는 뜻은 아니에요. 속임수 한 가지가 막혔다는 뜻일 뿐이에요.
+        </p>
+      </div>
+    </section>
+
+    <!-- 3. 오늘의 숫자 -->
+    <section class="card" id="sec-numbers" aria-labelledby="h-num">
+      <h2 id="h-num">📊 오늘의 숫자</h2>
+      <div id="numbers-body"><p class="loading">불러오는 중이에요…</p></div>
+      <h3 style="margin-top:22px">📈 날마다 어떻게 변했나요?</h3>
+      <p class="small">매일 새벽 4시 30분(한국 시간)에 새 코인 약 30개를 모아서, 열쇠를 버린 코인의 비율을 쌓아 그려요.</p>
+      <div id="chart-body"><p class="loading">불러오는 중이에요…</p></div>
+    </section>
+
+    <!-- 4. 코인 명단 -->
+    <section class="card" id="sec-coins" aria-labelledby="h-coins">
+      <h2 id="h-coins">📋 최근 코인 명단</h2>
+      <p class="small">✔ 버렸어요(반납) · ✖ 아직 갖고 있어요 · ? 확인하지 못했어요</p>
+      <div id="coins-body"><p class="loading">불러오는 중이에요…</p></div>
+    </section>
+
+    <!-- 5. 판정 게임판 -->
+    <section class="card" id="sec-verdict" aria-labelledby="h-verdict">
+      <h2 id="h-verdict">🎲 판정 게임판: A 대 B</h2>
+      <p>이 실험이 정말 궁금한 건 하나예요. <b>열쇠를 버리는 코인이 많아진 이유가 뭘까?</b></p>
+      <div class="grid" style="margin-bottom:10px">
+        <div class="tile" style="background:var(--b-soft)">
+          <h3>🅱️ 사람들 사이에 문화가 번졌다</h3>
+          <p class="small" style="margin:0">“열쇠를 버려야 믿을 만하다”는 생각이 만드는 사람들끼리 퍼졌다는 쪽이에요.</p>
+        </div>
+        <div class="tile" style="background:var(--a-soft)">
+          <h3>🅰️ 공장 초기값이 퍼진 것뿐이다</h3>
+          <p class="small" style="margin:0">코인 만드는 도구(pump.fun 등)가 처음부터 알아서 열쇠를 버리게 되어 있어서, 저절로 늘었을 뿐이라는 쪽이에요.</p>
+        </div>
+      </div>
+      <div id="verdict-body"><p class="loading">불러오는 중이에요…</p></div>
+      <div id="baseline-body" style="margin-top:18px"><p class="loading">과거 자료를 불러오는 중이에요…</p></div>
+    </section>
+
+    <footer>
+      <a class="btn" href="../">🧪 전문가용 원본 대시보드 보기 →</a>
+      <div class="notice" data-notice="교육·관측 목적 · 투자 권유 아님 · read-only" role="note">
+        <strong>교육·관측 목적 · 투자 권유 아님 · read-only</strong>
+        <p>이 페이지는 읽기만 합니다(거래 없음). 어떤 코인도 추천하지 않으며, 금액은 달러(USD)와 SOL 단위로만 표시해요.</p>
+      </div>
+    </footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ── 0. 고지문 존재 검사: 없으면 본문 대신 오류 안내만 표시 ──
+  var NOTICE = "교육·관측 목적 · 투자 권유 아님 · read-only";
+  var top = document.getElementById("notice-top");
+  var strong = top ? top.querySelector("strong") : null;
+  var noticeOk = !!(top &&
+    top.getAttribute("data-notice") === NOTICE &&
+    strong && strong.textContent.trim() === NOTICE);
+  if (!noticeOk) {
+    document.getElementById("guard-error").style.display = "block";
+    var app = document.getElementById("app");
+    if (app) app.parentNode.removeChild(app);
+    return;
+  }
+  document.getElementById("app").hidden = false;
+
+  // ── 공통 도우미 ──
+  var FAIL = '<p class="error">😢 이 부분의 자료를 불러오지 못했어요. 잠시 뒤 새로고침해 주세요.</p>';
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+  function isNum(v) { return typeof v === "number" && isFinite(v); }
+  // 0~1 비율 → 퍼센트 숫자 (혹시 이미 퍼센트면 그대로)
+  function ratePct(v) {
+    if (!isNum(v)) return null;
+    return v <= 1 ? v * 100 : v;
+  }
+  // 이미 퍼센트로 오는 값(상위 10명 물량)
+  function sharePct(v) {
+    if (!isNum(v)) return null;
+    return v > 0 && v <= 1 ? v * 100 : v;
+  }
+  function fmtPct(p, digits) {
+    if (!isNum(p)) return "–";
+    return p.toFixed(digits == null ? 1 : digits).replace(/\.0$/, "") + "%";
+  }
+  function fmtTime(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return null;
+    try {
+      return d.toLocaleString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }) + " (한국 시간)";
+    } catch (e) { return d.toISOString(); }
+  }
+  function get(obj, path) {
+    var cur = obj;
+    for (var i = 0; i < path.length; i++) {
+      if (cur == null || typeof cur !== "object") return undefined;
+      cur = cur[path[i]];
+    }
+    return cur;
+  }
+  // GET 전용, 캐시 사용 안 함
+  function load(url) {
+    return fetch(url, { method: "GET", cache: "no-store", credentials: "same-origin" })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      });
+  }
+  function setHTML(id, html) {
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  }
+
+  var TOOL_NAMES = {
+    pumpfun: "pump.fun", "pump.fun": "pump.fun", pumpswap: "PumpSwap",
+    meteora: "Meteora", orca: "Orca", raydium: "Raydium", moonshot: "Moonshot",
+    letsbonk: "LetsBonk", bonk: "LetsBonk", launchlab: "LaunchLab"
+  };
+  function toolName(kind) {
+    if (!kind) return "모름";
+    var k = String(kind).toLowerCase();
+    return TOOL_NAMES[k] || String(kind);
+  }
+  function authState(coin, key) {
+    var v = get(coin, ["authority_states", key]);
+    v = v == null ? "unknown" : String(v).toLowerCase();
+    if (v === "renounced") return "renounced";
+    if (v === "kept") return "kept";
+    return "unknown";
+  }
+  function keyBadge(state, label) {
+    if (state === "renounced") return '<span class="badge b-ok" title="' + label + ': 버렸어요">✔ ' + label + '</span>';
+    if (state === "kept") return '<span class="badge b-no" title="' + label + ': 아직 갖고 있어요">✖ ' + label + '</span>';
+    return '<span class="badge b-unk" title="' + label + ': 확인 못 함">? ' + label + '</span>';
+  }
+  function ageText(ms) {
+    if (!isNum(ms)) return "모름";
+    var h = (Date.now() - ms) / 3600000;
+    if (h < 0) return "방금";
+    if (h < 1) return "1시간 안 됨";
+    if (h < 48) return Math.floor(h) + "시간";
+    return Math.floor(h / 24) + "일";
+  }
+
+  // ── 인라인 SVG 꺾은선 그래프 ──
+  function lineChart(series) {
+    var pts = (Array.isArray(series) ? series : []).filter(function (s) { return s && s.date; });
+    if (!pts.length) return '<p class="small">아직 그래프로 그릴 날짜별 자료가 없어요.</p>';
+
+    var W = 640, H = 260, L = 44, R = 96, T = 16, B = 34;
+    var iw = W - L - R, ih = H - T - B;
+    function x(i) { return pts.length === 1 ? L + iw / 2 : L + (iw * i) / (pts.length - 1); }
+    function y(p) { return T + ih - (ih * Math.max(0, Math.min(100, p))) / 100; }
+
+    var lines = [
+      { key: "double_ren_rate", color: "var(--b)", name: "두 개 반납" },
+      { key: "deep_ren_rate", color: "var(--deep)", name: "세 개 모두 반납" }
+    ];
+    var svg = '<svg class="chart" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="날짜별 열쇠 반납 비율 꺾은선 그래프">';
+    [0, 25, 50, 75, 100].forEach(function (g) {
+      svg += '<line x1="' + L + '" x2="' + (L + iw) + '" y1="' + y(g) + '" y2="' + y(g) + '" stroke="#ece6dc" stroke-width="1"/>';
+      svg += '<text x="' + (L - 8) + '" y="' + (y(g) + 4) + '" font-size="12" text-anchor="end" fill="#8a8797">' + g + '%</text>';
+    });
+    svg += '<text x="' + x(0) + '" y="' + (H - 10) + '" font-size="12" text-anchor="' + (pts.length === 1 ? "middle" : "start") + '" fill="#8a8797">' + esc(pts[0].date) + '</text>';
+    if (pts.length > 1) {
+      svg += '<text x="' + x(pts.length - 1) + '" y="' + (H - 10) + '" font-size="12" text-anchor="end" fill="#8a8797">' + esc(pts[pts.length - 1].date) + '</text>';
+    }
+
+    var endLabels = [];
+    lines.forEach(function (ln) {
+      var d = "", last = null;
+      pts.forEach(function (p, i) {
+        var v = ratePct(p[ln.key]);
+        if (!isNum(v)) return;
+        d += (d ? " L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1);
+        svg += '<circle cx="' + x(i).toFixed(1) + '" cy="' + y(v).toFixed(1) + '" r="3.5" fill="' + ln.color + '"><title>' + esc(p.date) + " · " + ln.name + " " + fmtPct(v) + '</title></circle>';
+        last = { i: i, v: v };
+      });
+      if (d) svg += '<path d="' + d + '" fill="none" stroke="' + ln.color + '" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>';
+      if (last) endLabels.push({ y: y(last.v), x: x(last.i), text: ln.name + " " + fmtPct(last.v), color: ln.color });
+    });
+    // 끝 라벨이 겹치지 않도록 살짝 벌림
+    endLabels.sort(function (a, b) { return a.y - b.y; });
+    for (var k = 1; k < endLabels.length; k++) {
+      if (endLabels[k].y - endLabels[k - 1].y < 16) endLabels[k].y = endLabels[k - 1].y + 16;
+    }
+    endLabels.forEach(function (lb) {
+      svg += '<text x="' + (L + iw + 8) + '" y="' + (lb.y + 4) + '" font-size="12" font-weight="700" fill="' + lb.color + '">' + esc(lb.text) + '</text>';
+    });
+    svg += "</svg>";
+
+    var legend = '<div class="legend">' + lines.map(function (ln) {
+      return '<span><i style="background:' + ln.color + '"></i>' + ln.name + ' 비율</span>';
+    }).join("") + "</div>";
+    return svg + legend;
+  }
+
+  // ── 1·3·4. 최근 수집 자료 ──
+  function renderLatest(data) {
+    var s = data.summary || {};
+    var coins = Array.isArray(data.coins) ? data.coins : [];
+    var n = isNum(s.n) ? s.n : coins.length;
+
+    var when = fmtTime(data.generated_at);
+    var rpc = get(data, ["run", "rpc_calls"]), budget = get(data, ["run", "rpc_budget"]);
+    setHTML("updated",
+      (when ? "마지막으로 모은 시각: " + esc(when) : "모은 시각 정보가 없어요") +
+      (isNum(rpc) ? " · 오늘 조회 " + rpc + "회 / 하루 한도 " + (isNum(budget) ? budget : 400) + "회" : ""));
+
+    // 1. 한눈에 보기
+    var mintPct = ratePct(s.mint_ren_rate);
+    var mintCount = coins.length
+      ? coins.filter(function (c) { return authState(c, "mint") === "renounced"; }).length
+      : (isNum(mintPct) ? Math.round(n * mintPct / 100) : null);
+    var dblPct = ratePct(s.double_ren_rate);
+    var heroPct = coins.length && n ? (mintCount / coins.length) * 100 : mintPct;
+
+    var hero = "";
+    if (n && mintCount != null) {
+      hero += '<p class="hero-sentence">요즘 나오는 밈코인 <span class="hl">' + n + '개</span>를 살펴봤더니, <span class="hl">' + mintCount + '개</span>가 🖨️ ‘새 코인 찍기 열쇠’를 스스로 버렸어요.</p>';
+      hero += '<div class="meter" aria-hidden="true"><span style="width:' + Math.max(0, Math.min(100, heroPct || 0)).toFixed(1) + '%"></span></div>';
+      hero += '<p class="small">열 개 중 약 ' + (isNum(heroPct) ? Math.round(heroPct / 10) : "?") + '개꼴이에요.</p>';
+    } else {
+      hero += '<p class="hero-sentence">아직 살펴본 코인이 없어요.</p>';
+    }
+    if (isNum(dblPct)) {
+      hero += '<p style="font-size:1.12rem;font-weight:600;margin-top:10px">🖨️+🧊 찍기 열쇠와 얼리기 열쇠를 <b>둘 다</b> 버린 코인은 <span class="hl">' + fmtPct(dblPct) + '</span>예요.</p>';
+    }
+    setHTML("hero-body", hero);
+
+    // 3. 오늘의 숫자
+    var tN = s.template_n, cN = s.custom_n;
+    var tShare = ratePct(s.template_share_of_renunciations);
+    var top10 = sharePct(s.top10_filtered_mean);
+    var tiles = [
+      { label: "🪙 살펴본 코인 수", big: isNum(n) ? n + "개" : "–", mean: "최근 하루 동안 새로 나온 코인 중 자동으로 모은 개수예요." },
+      { label: "🖨️ 찍기 열쇠 버림", big: fmtPct(mintPct), mean: "만든 사람이 코인을 더 찍어내 값을 무너뜨릴 수 없는 코인의 비율이에요." },
+      { label: "🖨️+🧊 두 개 버림", big: fmtPct(dblPct), mean: "더 찍기도, 남의 통장 얼리기도 못 하게 된 코인의 비율이에요." },
+      { label: "🖨️+🧊+🪧 세 개 모두 버림", big: fmtPct(ratePct(s.deep_ren_rate)), mean: "간판(이름·그림)까지 영영 못 바꾸게 된 코인의 비율이에요." },
+      {
+        label: "🏭 도구가 버려준 것 vs 🙋 직접 버린 것",
+        big: (isNum(tN) ? tN : "–") + " : " + (isNum(cN) ? cN : "–"),
+        mean: "버린 경우 중 " + (isNum(tShare) ? "<b>" + fmtPct(tShare) + "</b>가" : "대부분이") +
+          " 코인 만드는 도구가 기본으로 반납해준 것이에요. 이 비율이 높을수록 A(공장 초기값) 쪽 이야기에 가까워져요."
+      },
+      { label: "👥 상위 10명이 쥔 물량", big: fmtPct(top10), mean: "가장 많이 가진 10명이 전체 코인의 몇 %를 들고 있는지 평균낸 값이에요. 높을수록 몇 사람 손에 몰려 있다는 뜻이에요." }
+    ];
+    setHTML("numbers-body", '<div class="grid">' + tiles.map(function (t) {
+      return '<div class="tile"><div class="label">' + t.label + '</div><div class="big">' + t.big + '</div><div class="mean">👉 ' + t.mean + '</div></div>';
+    }).join("") + "</div>");
+
+    // 꺾은선 그래프
+    setHTML("chart-body", lineChart(data.series));
+
+    // 4. 코인 명단 (최근 15개)
+    if (!coins.length) {
+      setHTML("coins-body", '<p class="small">아직 명단에 올릴 코인이 없어요.</p>');
+      return;
+    }
+    var sorted = coins.slice().sort(function (a, b) {
+      var am = get(a, ["pair", "pair_created_at_ms"]), bm = get(b, ["pair", "pair_created_at_ms"]);
+      return (isNum(bm) ? bm : -Infinity) - (isNum(am) ? am : -Infinity);
+    });
+    var shown = sorted.slice(0, 15);
+    var rows = shown.map(function (c) {
+      var t10 = sharePct(get(c, ["concentration", "top10_share_filtered"]));
+      return "<tr>" +
+        '<td data-label="이름(심볼)" class="sym">' + esc(c.expected_symbol || "이름 없음") + "</td>" +
+        '<td data-label="태어난 지">' + ageText(get(c, ["pair", "pair_created_at_ms"])) + "</td>" +
+        '<td data-label="나온 도구">' + esc(toolName(get(c, ["origin", "kind"]))) + "</td>" +
+        '<td data-label="열쇠 3개"><span>' +
+          keyBadge(authState(c, "mint"), "찍기") +
+          keyBadge(authState(c, "freeze"), "얼리기") +
+          keyBadge(authState(c, "update"), "간판") +
+        "</span></td>" +
+        '<td data-label="상위 10명 물량">' + fmtPct(t10) + "</td>" +
+        "</tr>";
+    }).join("");
+    var more = coins.length > shown.length
+      ? '<p class="small" style="margin-top:10px">가장 최근 ' + shown.length + '개만 보여드려요. 전체 ' + coins.length + '개는 <a href="../">전문가 버전</a>에서 볼 수 있어요.</p>'
+      : "";
+    setHTML("coins-body",
+      '<div class="table-wrap"><table><thead><tr><th>이름(심볼)</th><th>태어난 지</th><th>나온 도구</th><th>열쇠 3개</th><th>상위 10명 물량</th></tr></thead><tbody>' +
+      rows + "</tbody></table></div>" + more);
+  }
+
+  // ── 5. 판정 게임판 ──
+  var SWITCH_EASY = {
+    S1: "버린 열쇠 중 ‘도구가 기본으로 반납해준 것’이 75% 이상이면 → A(공장 초기값) 쪽으로 기울어요."
+  };
+
+  function readPrior(prior) {
+    var b = 55, a = 45;
+    if (prior && typeof prior === "object") {
+      var pb = prior.B != null ? prior.B : prior.b;
+      var pa = prior.A != null ? prior.A : prior.a;
+      if (isNum(pb) && isNum(pa) && pa + pb > 0) {
+        var tot = pa + pb;
+        b = Math.round((pb / tot) * 100);
+        a = 100 - b;
+      }
+    } else if (typeof prior === "string") {
+      var m = prior.match(/B\s*[:=]?\s*(\d+(?:\.\d+)?)[^\d]+A\s*[:=]?\s*(\d+(?:\.\d+)?)/i);
+      if (m) { b = +m[1]; a = +m[2]; }
+    }
+    return { b: b, a: a };
+  }
+
+  function readSwitches(sw) {
+    var list = [];
+    if (Array.isArray(sw)) {
+      sw.forEach(function (s, i) { list.push({ id: (s && (s.id || s.name)) || "S" + (i + 1), s: s || {} }); });
+    } else if (sw && typeof sw === "object") {
+      Object.keys(sw).sort().forEach(function (k) { list.push({ id: k, s: sw[k] || {} }); });
+    }
+    return list;
+  }
+
+  function renderVerdict(data) {
+    var v = data.verdict || {};
+    var winner = String(v.winner || "");
+    var p = readPrior(data.prior);
+    var switches = readSwitches(data.switches);
+    var firedCount = switches.filter(function (x) { return x.s.fired === true; }).length;
+
+    var html = "";
+    html += '<div class="score-row"><div class="score-name">🅱️ 문화가 번졌다</div><div class="score-bar"><span style="width:' + p.b + '%;background:var(--b)">' + p.b + "</span></div></div>";
+    html += '<div class="score-row"><div class="score-name">🅰️ 공장 초기값</div><div class="score-bar"><span style="width:' + p.a + '%;background:var(--a)">' + p.a + "</span></div></div>";
+    html += '<p class="small">처음 예상 점수예요 (B ' + p.b + " : A " + p.a + "). 실제 숫자가 쌓이면서 바뀔 수 있어요.</p>";
+
+    // winner 3가지 경우 + 알 수 없는 값까지 분기
+    var box;
+    if (winner === "B(prior)") {
+      box = '<div class="verdict-box v-b">⏳ 아직 확정이 아니에요. 처음 예상대로 <b>B(문화가 번졌다)</b> 쪽이 조금 앞선 상태로 지켜보는 중이에요.</div>';
+    } else if (winner === "A") {
+      box = '<div class="verdict-box v-a">🅰️ 지금 자료로는 <b>A(공장 초기값이 퍼진 것뿐)</b> 쪽으로 판정이 기울었어요.</div>';
+    } else if (winner === "B") {
+      box = '<div class="verdict-box v-b">🅱️ 지금 자료로는 <b>B(사람들 사이에 문화가 번졌다)</b> 쪽으로 판정이 기울었어요.</div>';
+    } else {
+      box = '<div class="verdict-box v-unk">❔ 판정 상태를 알 수 없어요. 전문가 버전에서 확인해 주세요.</div>';
+    }
+    html += box;
+    if (v.final) html += '<p class="small">📝 한 줄 요약(원본 문장): ' + esc(v.final) + "</p>";
+
+    // 뒤집기 스위치
+    html += '<h3 style="margin-top:18px">🔀 판정을 뒤집는 스위치 ' + (switches.length || 4) + "개</h3>";
+    html += '<p class="small">실제로 잰 숫자가 정해진 선을 넘으면 스위치가 켜지고, 점수가 뒤집혀요.</p>';
+    if (switches.length) {
+      html += '<div class="grid">' + switches.map(function (x, i) {
+        var s = x.s, fired = s.fired === true;
+        var easy = SWITCH_EASY[x.id];
+        return '<div class="tile switch' + (fired ? " fired" : "") + '">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">' +
+            "<h3 style=\"margin:0\">스위치 " + (i + 1) + " <span class=\"small\">(" + esc(x.id) + ")</span></h3>" +
+            (fired ? '<span class="badge b-fired">🔔 켜졌어요</span>' : '<span class="badge b-idle">💤 아직 꺼져 있어요</span>') +
+          "</div>" +
+          (easy ? '<p style="margin:8px 0 4px">' + easy + "</p>" : "") +
+          (s.condition ? '<p class="small" style="margin:4px 0">조건: ' + esc(s.condition) + "</p>" : "") +
+          (s.frame ? '<p class="small" style="margin:0">무엇을 보는 스위치인가: ' + esc(s.frame) + "</p>" : "") +
+          "</div>";
+      }).join("") + "</div>";
+    } else {
+      html += '<p class="small">스위치 정보를 불러오지 못했어요.</p>';
+    }
+
+    html += '<h3 style="margin-top:18px">🤔 왜 아직 결론을 못 냈나요?</h3>';
+    if (firedCount === 0) {
+      html += "<p>지금까지는 켜진 스위치가 하나도 없어요. 열쇠를 버린 코인이 많다는 건 분명하지만, 그게 <b>사람들이 서로 보고 따라 한 결과</b>인지, <b>도구가 원래 그렇게 만들어져서</b>인지는 숫자 하나만으로 가려낼 수 없어요. 그래서 날마다 새 코인을 모으면서, 어느 쪽 스위치가 먼저 켜지는지 기다리는 중이에요.</p>";
+    } else {
+      html += "<p>스위치가 " + firedCount + "개 켜졌어요. 그래도 하루하루 자료가 더 쌓여야 흔들리지 않는 결론이 돼요. 계속 지켜보고 있어요.</p>";
+    }
+    setHTML("verdict-body", html);
+  }
+
+  // ── 과거 자료(2026-09-26 소급 조사) ──
+  function renderBaseline(data) {
+    var era = data.era_contrast || {};
+    var e1 = ratePct(era.era1_double_rate), e2 = ratePct(era.era2_double_rate);
+    var fam = ratePct(era.era1_famous_rate), tail = ratePct(era.era1_tail_rate);
+    var tShare = ratePct(era.template_share_of_renunciations);
+    var bk = data.buckets || {};
+    var total = ["E1", "E2", "E3", "E4"].reduce(function (acc, k) { return acc + (isNum(bk[k]) ? bk[k] : 0); }, 0);
+
+    var html = '<div class="tile" style="background:#f7f4ff">';
+    html += "<h3>🕰️ 옛날 코인과 비교하면?</h3>";
+    html += '<p style="font-size:1.12rem;font-weight:700">두 개 반납 비율: 옛날 코인(2024년 이전) <span style="color:var(--a)">' + fmtPct(e1) +
+      '</span> → 요즘 코인(pump.fun 시대) <span style="color:var(--b)">' + fmtPct(e2) + "</span></p>";
+    html += '<p class="small">2026년 9월 26일에 과거 코인 ' + (total || 95) + "개를 거슬러 올라가 조사한 결과예요." +
+      (total ? " (2021년 " + (bk.E1 || 0) + "개 · 2022~23년 " + (bk.E2 || 0) + "개 · 2024년 " + (bk.E3 || 0) + "개 · 2025~26년 " + (bk.E4 || 0) + "개)" : "") + "</p>";
+    if (isNum(fam) || isNum(tail)) {
+      html += '<p class="small">옛날 코인 중에서도 유명한 코인은 ' + fmtPct(fam) + ", 이름 없는 코인은 " + fmtPct(tail) + "가 두 열쇠를 버렸어요.</p>";
+    }
+    if (isNum(tShare)) {
+      html += '<p class="small">과거 자료에서 버린 열쇠 중 도구가 기본으로 반납해준 비중은 ' + fmtPct(tShare) + "예요.</p>";
+    }
+    html += "</div>";
+    setHTML("baseline-body", html);
+  }
+
+  // ── 자료 불러오기 (서로 독립: 하나가 실패해도 나머지는 표시) ──
+  load("../data/latest.json").then(renderLatest).catch(function () {
+    setHTML("updated", "최근 자료를 불러오지 못했어요.");
+    ["hero-body", "numbers-body", "chart-body", "coins-body"].forEach(function (id) { setHTML(id, FAIL); });
+  });
+  load("../data/verdict.json").then(renderVerdict).catch(function () { setHTML("verdict-body", FAIL); });
+  load("../data/baseline/aggregate.json").then(renderBaseline).catch(function () { setHTML("baseline-body", FAIL); });
+})();
+</script>
+</body>
+</html>
