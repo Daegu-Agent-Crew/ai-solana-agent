@@ -1,0 +1,106 @@
+# deadman-observation.yml — CLE2-29 데드맨 스위치 (일일 관측 누락 감시)
+# 매일 05:30 KST (cron 20:30 UTC, 일일 04:30 수집 크론 후 1시간) + 수동 실행(date 입력).
+# 관측 존재 판정: latest.json의 generated_at을 KST로 환산한 날짜 == 대상 날짜
+#   (보조: snapshots/<date>/ 디렉터리에 스냅샷 존재 시에도 관측 있음으로 판정)
+# 시간대 원칙: KST 단일화 (env TZ=Asia/Seoul)
+name: deadman-observation
+
+on:
+  schedule:
+    - cron: "30 20 * * *"   # 05:30 KST
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "점검 대상 날짜 (YYYY-MM-DD, 기본: 오늘 KST). 테스트용 과거/미래 날짜 가능"
+        required: false
+        default: ""
+
+env:
+  TZ: Asia/Seoul
+
+permissions:
+  contents: write    # 관측 누락 마커 데이터 커밋 (기존 일일 데이터 커밋 패턴과 동일)
+  issues: write      # 누락 알림 이슈 생성
+
+concurrency:
+  group: deadman-observation
+  cancel-in-progress: false
+
+jobs:
+  deadman:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 관측 존재 판정 (KST)
+        id: check
+        run: |
+          CHECK_DATE="${{ github.event.inputs.date }}"
+          if [ -z "$CHECK_DATE" ]; then
+            CHECK_DATE=$(TZ=Asia/Seoul date +%F)
+          fi
+          if ! echo "$CHECK_DATE" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+            echo "잘못된 날짜 형식: $CHECK_DATE" >&2; exit 1
+          fi
+          echo "check_date=$CHECK_DATE" >> "$GITHUB_OUTPUT"
+
+          # 주 신호: latest.json generated_at → KST 날짜
+          GEN_AT=$(python3 -c "import json;print(json.load(open('dapp4/census/data/latest.json'))['generated_at'])" 2>/dev/null || echo "")
+          KST_DATE_OF_LATEST=""
+          if [ -n "$GEN_AT" ]; then
+            KST_DATE_OF_LATEST=$(TZ=Asia/Seoul date -d "$GEN_AT" +%F)
+          fi
+          # 보조 신호: snapshots/<date>/ 스냅샷 파일 존재 (동일 날짜 오후 수동 관측 커버)
+          SNAP_DIR="dapp4/census/data/snapshots/$CHECK_DATE"
+          if [ "$KST_DATE_OF_LATEST" = "$CHECK_DATE" ] || ls "$SNAP_DIR"/*.json >/dev/null 2>&1; then
+            echo "observed=true" >> "$GITHUB_OUTPUT"
+            echo "✅ 관측 확인 — 대상 $CHECK_DATE (latest generated_at KST=$KST_DATE_OF_LATEST) → no-op 종료"
+          else
+            echo "observed=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️ 관측 누락 — 대상 $CHECK_DATE (latest generated_at KST=$KST_DATE_OF_LATEST)"
+          fi
+
+      - name: 누락 마커 생성 + 데이터 커밋 (create-only)
+        if: steps.check.outputs.observed == 'false'
+        run: |
+          DATE="${{ steps.check.outputs.check_date }}"
+          MARKER="dapp4/census/data/missing/$DATE.json"
+          if [ -e "$MARKER" ]; then
+            echo "마커 이미 존재($MARKER) — 생성 스킵(create-only)"
+          else
+            mkdir -p "dapp4/census/data/missing"
+            NOW_ISO=$(TZ=Asia/Seoul date -u +%Y-%m-%dT%H:%M:%SZ)
+            printf '{\n "date": "%s",\n "status": "missing",\n "detected_by": "deadman-actions",\n "detected_at": "%s",\n "note": "일일 관측(04:30 KST 크론)이 05:30 KST 데드맨 점검 시점까지 도착하지 않음 — 2일 누적 시 전체 유보(PRE-REGISTRATION 참조)"\n}\n' "$DATE" "$NOW_ISO" > "$MARKER"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add "$MARKER"
+            git commit -m "data(CLE2-29): 관측 누락 마커 $DATE — 데드맨 감지
+
+            🤖 agent:daeguru
+            Co-authored-by: 대구루 <daeguru@daegu-agent-crew.github.io>"
+            git push origin main
+            echo "마커 커밋·푸시 완료 → $MARKER"
+          fi
+
+      - name: 누락 알림 이슈 생성
+        if: steps.check.outputs.observed == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          DATE="${{ steps.check.outputs.check_date }}"
+          TITLE="⚠️ 관측 누락 $DATE — 유보 조건 추적(2일 누적 시 전체 유보, PRE-REGISTRATION 참조)"
+          EXISTING=$(gh issue list --state open --search "in:title 관측 누락 $DATE" --json number --jq '.[0].number' || true)
+          if [ -n "$EXISTING" ]; then
+            echo "동일 날짜 오픈 이슈 #${EXISTING} 존재 — 신규 생성 스킵"
+          else
+            gh issue create --title "$TITLE" --body "일일 관측(04:30 KST 크론)이 $DATE일차에 도착하지 않았습니다(데드맨 05:30 KST 점검).
+
+            - 마커: `dapp4/census/data/missing/$DATE.json` (create-only, 자동 커밋됨)
+            - 유보 조건: 2일 누적 시 전체 유보 — PRE-REGISTRATION 참조
+            - 점검 run: $RUN_URL
+            - 조치: 수집기 수동 실행 `python3 dapp4-pipeline/scripts/census-collector.py --coins 30` 후 재점검(workflow_dispatch)
+
+            🤖 agent:daeguru"
+            echo "이슈 생성 완료"
+          fi

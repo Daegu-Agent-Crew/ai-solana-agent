@@ -1,0 +1,261 @@
+{
+ "generated_at": "2026-09-27T19:28:45+00:00",
+ "kst_date": "2026-09-28",
+ "mode": "random-sample",
+ "purpose": "무작위 표본 편향 점검 — 일일 전수 관측(latest.json)과 독립 프레임",
+ "selection": {
+  "seed_source": "sha256('2026-09-28')",
+  "candidate_pool": 34,
+  "requested_n": 10,
+  "selected_n": 10,
+  "deterministic": true,
+  "skipped": []
+ },
+ "summary": {
+  "n": 10,
+  "mint_renounced": 10,
+  "double_renounced": 10,
+  "deep_renounced": 0,
+  "mint_ren_rate": 1.0,
+  "double_ren_rate": 1.0,
+  "deep_ren_rate": 0.0,
+  "origin_kinds": {
+   "template": 10
+  }
+ },
+ "rpc_calls": 20,
+ "rpc_budget_this_run": 120,
+ "consumer_daily_used_after": 20,
+ "coins": [
+  {
+   "addr": "3Hs8KJVTV4jvoFLNifGvrQBZPHQpdAppSdGnr41oGjLP",
+   "expected_symbol": "NORMIES",
+   "origin": {
+    "kind": "template",
+    "evidence": [
+     "dexId=meteoradbc"
+    ],
+    "has_socials": false
+   },
+   "authority_states": {
+    "mint": "renounced",
+    "freeze": "renounced",
+    "update": "unknown"
+   },
+   "mintR": true,
+   "freezeR": true,
+   "doubleR": true,
+   "deepR": false,
+   "status": "ok"
+  },
+  {
+   "addr": "DQqjGPYLQnDYKRDdHkUWYRNvtgvTScivV7PLPisqpump",
+   "expected_symbol": "TikPaid",
+   "origin": {
+    "kind": "template",
+    "evidence": [
+     "dexId=pumpfun",
+     "본딩커브 거래 중(마이그레이션 전)",
+     "launchpad=pump_fun"
+    ],
+    "has_socials": false
+   },
+   "authority_states": {
+    "mint": "renounced",
+    "freeze": "renounced",
+    "update": "unknown"
+   },
+   "mintR": true,
+   "freezeR": true,
+   "doubleR": true,
+   "deepR": false,
+   "status": "ok"
+  },
+  {
+   "addr": "4WEVqAx6W9bzj3ktWKbPSa83p3dz4Fhc2qkPYkGipump",
+   "expected_symbol": "Mayhem",
+   "origin": {
+    "kind": "template",
+    "evidence": [
+     "dexId=pumpfun",
+     "본딩커브 거래 중(마이그레이션 전)",
+     "launchpad=pump_fun"
+    ],
+    "has_socials": false
+   },
+   "authority_states": {
+    "mint": "renounced",
+    "freeze": "renounced",
+    "update": "unknown"
+   },
+   "mintR": true,
+   "freezeR": true,
+   "doubleR": true,
+   "deepR": false,
+   "status": "ok"
+  },
+  {
+   "addr": "YtgUyfTKAKgvT8qK88j7zkXLwj1f6GvPvj3SoiMpump",
+   "expected_symbol": "PAYSX",
+   "origin": {
+    "kind": "template",
+    "evidence": [
+     "dexId=pumpfun",
+     "본딩커브 거래 중(마이그레이션 전)",
+     "launchpad=pump_fun"
+    ],
+    "has_socials": false
+   },
+   "authority_states": {
+    "mint": "renounced",
+    "freeze": "renounced",
+    "update": "unknown"
+   },
+   "mintR": true,
+   "freezeR": true,
+   "doubleR": true,
+   "deepR": false,
+   "status": "ok"
+  },
+  {
+   "addr": "EvqkysCDUXtuetQzZkVVyVJJSY7LsK5VKUM6BW77A2Yh",
+   "expected_symbol": "UPTOBER",
+   "origin": {
+    "kind": "template",
+    "evidence": [
+     "dexId=meteoradbc"
+    ],
+    "has_socials": false
+   },
+   "authority_states": {
+    "mint": "renounced",
+    "freeze": "renounced",
+    "update": "unknown"
+   },
+   "mintR": true,
+   "freezeR": true,
+   "doubleR": true,
+   "deepR": false,
+   "status": "ok"
+  },
+  {
+   "addr": "KRfNKskEkurfuqaC4ftTNAaZqn789XHXNe3y18bpump",
+   "expected_symbol": "ERS",
+   "origin": {
+    "kind": "template",
+    "evidence": [
+     "dexId=pumpfun",
+     "본딩커브 거래 중(마이그레이션 전)",
+     "launchpad=pump_fun"
+    ],
+    "has_socials": false
+   },
+   "authority_states": {
+    "mint": "renounced",
+    "freeze": "renounced",
+    "update": "unknown"
+   },
+   "mintR": true,
+   "freezeR": true,
+   "doubleR": true,
+   "deepR": false,
+   "status": "ok"
+  },
+  {
+   "addr": "uC6yK7TkHy3qzkJUgCTCUYLycvLCG6CWdFL6yNepump",
+   "expected_symbol": "SENT",
+   "origin": {
+    "kind": "template",
+    "evidence": [
+     "dexId=pumpfun",
+     "본딩커브 거래 중(마이그레이션 전)",
+     "launchpad=pump_fun"
+    ],
+    "has_socials": false
+   },
+   "authority_states": {
+    "mint": "renounced",
+    "freeze": "renounced",
+    "update": "unknown"
+   },
+   "mintR": true,
+   "freezeR": true,
+   "doubleR": true,
+   "deepR": false,
+   "status": "ok"
+  },
+  {
+   "addr": "4F9E7Rvp46K5b1tePh58nFpAaRr1cjjYQcf2AuXTpump",
+   "expected_symbol": "JUMP",
+   "origin": {
+    "kind": "template",
+    "evidence": [
+     "dexId=pumpfun",
+     "본딩커브 거래 중(마이그레이션 전)",
+     "launchpad=pump_fun"
+    ],
+    "has_socials": false
+   },
+   "authority_states": {
+    "mint": "renounced",
+    "freeze": "renounced",
+    "update": "unknown"
+   },
+   "mintR": true,
+   "freezeR": true,
+   "doubleR": true,
+   "deepR": false,
+   "status": "ok"
+  },
+  {
+   "addr": "EMqYB1fzeBg5xutavwp4pnte6mzh4frwCUTmmmxbpump",
+   "expected_symbol": "PROOF",
+   "origin": {
+    "kind": "template",
+    "evidence": [
+     "dexId=pumpfun",
+     "본딩커브 거래 중(마이그레이션 전)",
+     "launchpad=pump_fun"
+    ],
+    "has_socials": false
+   },
+   "authority_states": {
+    "mint": "renounced",
+    "freeze": "renounced",
+    "update": "unknown"
+   },
+   "mintR": true,
+   "freezeR": true,
+   "doubleR": true,
+   "deepR": false,
+   "status": "ok"
+  },
+  {
+   "addr": "6auzdgnCo84rzJdxdLHQgwnKQJ17WPuoematST68pump",
+   "expected_symbol": "GRUMBL",
+   "origin": {
+    "kind": "template",
+    "evidence": [
+     "dexId=pumpfun",
+     "본딩커브 거래 중(마이그레이션 전)",
+     "launchpad=pump_fun"
+    ],
+    "has_socials": false
+   },
+   "authority_states": {
+    "mint": "renounced",
+    "freeze": "renounced",
+    "update": "unknown"
+   },
+   "mintR": true,
+   "freezeR": true,
+   "doubleR": true,
+   "deepR": false,
+   "status": "ok"
+  }
+ ],
+ "compliance": {
+  "purpose": "교육·관측 목적 · 투자 권유 아님 · read-only",
+  "currency": "USD/SOL only"
+ }
+}
