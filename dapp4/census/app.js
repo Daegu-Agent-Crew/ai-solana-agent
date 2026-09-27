@@ -26,10 +26,13 @@
   }
 
   function krwGate() {
-    var t = document.body.textContent || "";
+    /* 검사 대상은 main(데이터 렌더 영역)뿐 — 고지문 자체에 "KRW 표기 없음" 문구가
+       포함되므로 body 전체를 검사하면 자기충돌로 항상 발동함(2026-09-27 수정) */
+    var m = document.querySelector("main");
+    var t = m ? (m.textContent || "") : "";
     if (/₩|KRW|원화/.test(t)) {
       document.getElementById("complianceError").classList.remove("hidden");
-      document.querySelector("main").style.display = "none";
+      if (m) m.style.display = "none";
       throw new Error("KRW 표기 감지 — 렌더 거부 (USD/SOL만 허용)");
     }
   }
