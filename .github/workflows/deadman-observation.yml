@@ -94,13 +94,16 @@ jobs:
           if [ -n "$EXISTING" ]; then
             echo "동일 날짜 오픈 이슈 #${EXISTING} 존재 — 신규 생성 스킵"
           else
-            gh issue create --title "$TITLE" --body "일일 관측(04:30 KST 크론)이 $DATE일차에 도착하지 않았습니다(데드맨 05:30 KST 점검).
-
-            - 마커: `dapp4/census/data/missing/$DATE.json` (create-only, 자동 커밋됨)
-            - 유보 조건: 2일 누적 시 전체 유보 — PRE-REGISTRATION 참조
-            - 점검 run: $RUN_URL
-            - 조치: 수집기 수동 실행 `python3 dapp4-pipeline/scripts/census-collector.py --coins 30` 후 재점검(workflow_dispatch)
-
-            🤖 agent:daeguru"
+            printf '%s\n' \
+              "일일 관측(04:30 KST 크론)이 $DATE일차에 도착하지 않았습니다(데드맨 05:30 KST 점검)." \
+              "" \
+              "- 마커: \`dapp4/census/data/missing/$DATE.json\` (create-only, 자동 커밋됨)" \
+              "- 유보 조건: 2일 누적 시 전체 유보 — PRE-REGISTRATION 참조" \
+              "- 점검 run: $RUN_URL" \
+              "- 조치: 수집기 수동 실행 \`python3 dapp4-pipeline/scripts/census-collector.py --coins 30\` 후 재점검(workflow_dispatch)" \
+              "" \
+              "🤖 agent:daeguru" \
+              > /tmp/issue-body.md
+            gh issue create --title "$TITLE" --body-file /tmp/issue-body.md
             echo "이슈 생성 완료"
           fi

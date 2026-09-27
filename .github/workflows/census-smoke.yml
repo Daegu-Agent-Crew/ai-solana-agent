@@ -72,5 +72,5 @@ jobs:
           else
             gh issue create --title "${TITLE}" --body "${RUN_URL}
 
-          ${BODY}" --label "" && echo "이슈 생성 완료"
+          ${BODY}" && echo "이슈 생성 완료"
           fi
